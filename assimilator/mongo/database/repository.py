@@ -1,4 +1,4 @@
-from typing import Union, Optional, Collection, Type, TypeVar, Any
+from typing import Union, Optional, Collection, Type, TypeVar
 
 from pymongo import MongoClient
 

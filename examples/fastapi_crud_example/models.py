@@ -3,8 +3,8 @@ from typing import List
 
 from sqlalchemy import (
     create_engine, Column, String, Float,
-    Integer, ForeignKey, UniqueConstraint,
-    Table, UUID, Text,
+    ForeignKey, UniqueConstraint,
+    Table, Text,
 )
 from sqlalchemy.orm import relationship, registry
 
