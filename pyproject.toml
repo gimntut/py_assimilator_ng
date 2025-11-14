@@ -74,3 +74,12 @@ mongo = [
 'Github' = 'https://github.com/knucklesuganda/py_assimilator/'
 'Youtube RU' = 'https://www.youtube.com/channel/UCSNpJHMOU7FqjD4Ttux0uuw'
 'Youtube ENG' = 'https://www.youtube.com/channel/UCeC9LNDwRP9OfjyOFHaSikA'
+
+[dependency-groups]
+dev = [
+    "black>=24.8.0",
+]
+
+[tool.black]
+target-version = ['py38','py310','py311','py312','py313']
+line-length = 120
