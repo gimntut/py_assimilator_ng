@@ -19,7 +19,7 @@ class Specification(ABC):
 
 
 class FilterSpecification(Specification, ABC):
-    filtering_options_cls: Type[FilteringOptions]
+    filtering_options_cls: type[FilteringOptions]
 
     def __init__(self, *filters, **named_filters):
         self.filters = list(filters)
@@ -56,7 +56,7 @@ def specification(func: Callable) -> Callable:
 
 
 class SpecificationList:
-    filter: Type[FilterSpecification]
+    filter: type[FilterSpecification]
     order: OrderSpecificationProtocol
     paginate: PaginateSpecificationProtocol
     join: JoinSpecificationProtocol

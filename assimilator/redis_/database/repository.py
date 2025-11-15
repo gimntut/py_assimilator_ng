@@ -27,14 +27,14 @@ RedisModelT = TypeVar("RedisModelT", bound=BaseModel)
 class RedisRepository(Repository):
     session: Redis
     transaction: Union[Pipeline, Redis]
-    model: Type[RedisModelT]
+    model: type[RedisModelT]
 
     def __init__(
         self,
         session: Redis,
-        model: Type[RedisModelT],
+        model: type[RedisModelT],
         initial_query: Optional[str] = '',
-        specifications: Type[SpecificationList] = InternalSpecificationList,
+        specifications: type[SpecificationList] = InternalSpecificationList,
         error_wrapper: Optional[ErrorWrapper] = None,
         use_double_filter: bool = True,
     ):

@@ -12,9 +12,9 @@ class PatternList(BaseModel):
     class Config:
         frozen = True
 
-    repository: Type[Repository]
-    uow: Type[UnitOfWork]
-    crud: Type[CRUDService]
+    repository: type[Repository]
+    uow: type[UnitOfWork]
+    crud: type[CRUDService]
 
 
 registry: Dict[str, PatternList] = {}
@@ -40,7 +40,7 @@ def unregister_provider(provider: str):
         raise ProviderNotFoundError(f"Provider {provider} was not found")
 
 
-def get_pattern(provider: str, pattern_name: str) -> Type[Union[Repository, UnitOfWork, CRUDService]]:
+def get_pattern(provider: str, pattern_name: str) -> type[Union[Repository, UnitOfWork, CRUDService]]:
     try:
         pattern_cls = getattr(registry[provider], pattern_name, None)
     except KeyError:

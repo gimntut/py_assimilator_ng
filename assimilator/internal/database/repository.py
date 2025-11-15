@@ -19,14 +19,14 @@ ModelT = TypeVar("ModelT", bound=BaseModel)
 
 class InternalRepository(Repository):
     session: dict
-    model: Type[ModelT]
+    model: type[ModelT]
 
     def __init__(
         self,
         session: dict,
-        model: Type[ModelT],
+        model: type[ModelT],
         initial_query: Optional[str] = '',
-        specifications: Type[InternalSpecificationList] = InternalSpecificationList,
+        specifications: type[InternalSpecificationList] = InternalSpecificationList,
         error_wrapper: Optional[ErrorWrapper] = None,
     ):
         super(InternalRepository, self).__init__(

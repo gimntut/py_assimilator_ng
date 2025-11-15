@@ -56,7 +56,7 @@ class BaseModel(PydanticBaseModel):
         super(BaseModel, self).__init__(**kwargs)
 
     @classmethod
-    def loads(cls: Type['T'], data: str) -> 'T':
+    def loads(cls: type['T'], data: str) -> 'T':
         try:
             return cls(**json.loads(data))
         except (ValidationError, TypeError) as exc:

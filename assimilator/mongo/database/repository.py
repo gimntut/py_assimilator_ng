@@ -16,14 +16,14 @@ ModelT = TypeVar("ModelT", bound=MongoModel)
 class MongoRepository(Repository):
     id: str = "_id"
     session: MongoClient
-    model: Type[MongoModel]
+    model: type[MongoModel]
 
     def __init__(
         self,
         session: MongoClient,
-        model: Type[MongoModel],
+        model: type[MongoModel],
         database: str,
-        specifications: Type[SpecificationList] = MongoSpecificationList,
+        specifications: type[SpecificationList] = MongoSpecificationList,
         initial_query: Optional[dict] = None,
         error_wrapper: Optional[ErrorWrapper] = None,
     ):

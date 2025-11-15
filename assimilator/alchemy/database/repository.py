@@ -17,14 +17,14 @@ AlchemyModelT = TypeVar("AlchemyModelT")
 
 class AlchemyRepository(Repository):
     session: Session
-    model: Type[AlchemyModelT]
+    model: type[AlchemyModelT]
 
     def __init__(
         self,
         session: Session,
-        model: Type[AlchemyModelT],
+        model: type[AlchemyModelT],
         initial_query: Query = None,
-        specifications: Type[AlchemySpecificationList] = AlchemySpecificationList,
+        specifications: type[AlchemySpecificationList] = AlchemySpecificationList,
         error_wrapper: Optional[ErrorWrapper] = None,
     ):
         super(AlchemyRepository, self).__init__(

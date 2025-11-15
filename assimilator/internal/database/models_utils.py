@@ -5,14 +5,14 @@ from pydantic import BaseModel as PydanticBaseModel
 from assimilator.core.database.models import BaseModel
 
 
-def get_model_relationship(model: Type[BaseModel], field_name: str) -> Union[Type[BaseModel], None]:
+def get_model_relationship(model: type[BaseModel], field_name: str) -> Union[type[BaseModel], None]:
     try:
         return model.__fields__.get(field_name).type_
     except AttributeError:
         return None
 
 
-def dict_to_internal_models(data: dict, model: Type[BaseModel]) -> dict:
+def dict_to_internal_models(data: dict, model: type[BaseModel]) -> dict:
     for field_name, value in dict(data).items():
         field_type = get_model_relationship(model, field_name)
         if field_type is None:

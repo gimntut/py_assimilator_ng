@@ -13,10 +13,10 @@ class AlchemyOutboxRepository(AlchemyRepository):
     def __init__(
         self,
         session,
-        event_model: Type[Table],
-        model: Type[Table],
+        event_model: type[Table],
+        model: type[Table],
         initial_query: Optional[Query] = None,
-        specifications: Type[SpecificationList] = AlchemySpecificationList,
+        specifications: type[SpecificationList] = AlchemySpecificationList,
         error_wrapper: ErrorWrapper = None,
     ):
         super(AlchemyOutboxRepository, self).__init__(

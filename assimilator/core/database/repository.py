@@ -30,14 +30,14 @@ def make_lazy(func: Callable):
 QueryT = TypeVar("QueryT")
 ModelT = TypeVar("ModelT")
 SessionT = TypeVar("SessionT")
-SpecsT = TypeVar("SpecsT", bound=Type[SpecificationList])
+SpecsT = TypeVar("SpecsT", bound=type[SpecificationList])
 
 
 class Repository(Generic[SessionT, ModelT, QueryT], ABC):
     def __init__(
         self,
         session: SessionT,
-        model: Type[ModelT],
+        model: type[ModelT],
         specifications: SpecsT,
         initial_query: Optional[QueryT] = None,
         error_wrapper: Optional[ErrorWrapper] = None,

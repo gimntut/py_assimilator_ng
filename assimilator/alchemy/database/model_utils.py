@@ -11,7 +11,7 @@ def get_model_from_relationship(model: T, relationship_name: str):
     return foreign_prop.entity.class_, foreign_prop.uselist
 
 
-def dict_to_alchemy_models(data: dict, model: Type[T]) -> T:
+def dict_to_alchemy_models(data: dict, model: type[T]) -> T:
     for relationship in inspect(model).relationships.keys():
         foreign_data = data.get(relationship)
         if foreign_data is None:
