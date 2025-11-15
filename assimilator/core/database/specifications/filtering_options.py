@@ -3,15 +3,14 @@ from typing import Dict, Protocol, Any, Callable
 
 
 class FilterOptionProtocol(Protocol):
-    def __call__(self, field: str, value: Any) -> Callable[[], Any]:
-        ...
+    def __call__(self, field: str, value: Any) -> Callable[[], Any]: ...
 
 
 FILTERING_OPTIONS_SEPARATOR = "__"
 
 
 class FilteringOptions:
-    """ Looks for the filtering option """
+    """Looks for the filtering option"""
 
     def __init__(self):
         self.filter_options: Dict[str, FilterOptionProtocol] = {
@@ -86,7 +85,7 @@ class FilteringOptions:
 
 
 __all__ = [
-    'FilteringOptions',
-    'FilterOptionProtocol',
-    'FILTERING_OPTIONS_SEPARATOR',
+    "FilteringOptions",
+    "FilterOptionProtocol",
+    "FILTERING_OPTIONS_SEPARATOR",
 ]

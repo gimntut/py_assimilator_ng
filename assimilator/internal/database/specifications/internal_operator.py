@@ -89,15 +89,15 @@ def invert(func: Callable):
 
 
 __all__ = [
-    'find_attribute',
-    'eq',
-    'gt',
-    'gte',
-    'lt',
-    'lte',
-    'not_',
-    'is_',
-    'regex',
-    'like',
-    'invert',
+    "find_attribute",
+    "eq",
+    "gt",
+    "gte",
+    "lt",
+    "lte",
+    "not_",
+    "is_",
+    "regex",
+    "like",
+    "invert",
 ]

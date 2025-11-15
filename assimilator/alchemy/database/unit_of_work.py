@@ -35,5 +35,5 @@ class AlchemyUnitOfWork(UnitOfWork):
 
 
 __all__ = [
-    'AlchemyUnitOfWork',
+    "AlchemyUnitOfWork",
 ]

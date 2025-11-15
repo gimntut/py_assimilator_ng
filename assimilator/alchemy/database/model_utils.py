@@ -26,10 +26,7 @@ def dict_to_alchemy_models(data: dict, model: type[T]) -> T:
             foreign_data = dict_to_alchemy_models(data=foreign_data, model=foreign_model)
             foreign_data = foreign_model(**foreign_data)
         elif is_list:
-            foreign_models = (
-                foreign_data for foreign_data in foreign_data
-                if isinstance(foreign_data, dict)
-            )
+            foreign_models = (foreign_data for foreign_data in foreign_data if isinstance(foreign_data, dict))
 
             for i, foreign_part in enumerate(foreign_models):
                 foreign_part = dict_to_alchemy_models(data=foreign_part, model=foreign_model)

@@ -61,5 +61,5 @@ class CRUDService(Service):
 
 
 __all__ = [
-    'CRUDService',
+    "CRUDService",
 ]

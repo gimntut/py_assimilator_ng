@@ -40,7 +40,7 @@ class EventBus:
 
 
 __all__ = [
-    'EventConsumer',
-    'EventProducer',
-    'EventBus',
+    "EventConsumer",
+    "EventProducer",
+    "EventBus",
 ]

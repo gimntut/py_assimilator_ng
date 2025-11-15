@@ -26,11 +26,7 @@ class ErrorWrapper:
         return self
 
     def is_already_wrapped(self, exc_type: type[Exception]) -> bool:
-        return any(
-            issubclass(exc_type, error)
-            for error in self.skipped_errors
-            if issubclass(error, Exception)
-        )
+        return any(issubclass(exc_type, error) for error in self.skipped_errors if issubclass(error, Exception))
 
     def create_error(self, original_error: Exception, wrapped_error_type: type[Exception]):
         _, _, tb = sys.exc_info()
@@ -55,7 +51,7 @@ class ErrorWrapper:
                 wrapped_error_type=self.default_error,
             )
 
-        return False   # No wrapping error was found
+        return False  # No wrapping error was found
 
     def decorate(self, func: Callable) -> Callable:
         @wraps(func)
@@ -70,4 +66,4 @@ class ErrorWrapper:
         return f"{type(self).__name__}({self.error_mappings})"
 
 
-__all__ = ['ErrorWrapper']
+__all__ = ["ErrorWrapper"]

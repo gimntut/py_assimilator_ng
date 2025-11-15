@@ -70,17 +70,14 @@ class AlchemyRepository(Repository):
         if specifications:
             if not update_values:
                 raise InvalidQueryError(
-                    "You did not provide any update_values "
-                    "to the update() yet provided specifications"
+                    "You did not provide any update_values " "to the update() yet provided specifications"
                 )
 
             query = self._apply_specifications(
                 query=update(self.model),
                 specifications=specifications,
             )
-            self.session.execute(
-                query.values(update_values).execution_options(synchronize_session=False)
-            )
+            self.session.execute(query.values(update_values).execution_options(synchronize_session=False))
 
         elif obj is not None:
             if obj not in self.session:
@@ -107,10 +104,12 @@ class AlchemyRepository(Repository):
         obj, specifications = self._check_obj_is_specification(obj, specifications)
 
         if specifications:
-            self.session.execute(self._apply_specifications(
-                query=delete(self.model),
-                specifications=specifications,
-            ))
+            self.session.execute(
+                self._apply_specifications(
+                    query=delete(self.model),
+                    specifications=specifications,
+                )
+            )
         elif obj is not None:
             self.session.delete(obj)
 
@@ -118,17 +117,12 @@ class AlchemyRepository(Repository):
         return obj in self.session and self.session.is_modified(obj)
 
     def count(
-        self,
-        *specifications: SpecificationType,
-        lazy: bool = False,
-        initial_query: Query = None
+        self, *specifications: SpecificationType, lazy: bool = False, initial_query: Query = None
     ) -> Union[LazyCommand[int], int]:
         primary_keys = inspect(self.model).primary_key
 
         if not primary_keys:
-            raise InvalidQueryError(
-                "Your repository model does not have any primary keys. We cannot use count()"
-            )
+            raise InvalidQueryError("Your repository model does not have any primary keys. We cannot use count()")
 
         return self.get(
             *specifications,
@@ -138,5 +132,5 @@ class AlchemyRepository(Repository):
 
 
 __all__ = [
-    'AlchemyRepository',
+    "AlchemyRepository",
 ]

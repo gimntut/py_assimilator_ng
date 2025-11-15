@@ -25,7 +25,7 @@ def register_provider(provider: str, pattern_list: PatternList):
 
 
 def find_provider(provider_path: str):
-    """ Imports a module that has automatic pattern registration """
+    """Imports a module that has automatic pattern registration"""
     importlib.import_module(provider_path)
 
 
@@ -53,10 +53,10 @@ def get_pattern(provider: str, pattern_name: str) -> type[Union[Repository, Unit
 
 
 __all__ = [
-    'register_provider',
-    'unregister_provider',
-    'PatternList',
-    'get_pattern_list',
-    'get_pattern',
-    'find_provider',
+    "register_provider",
+    "unregister_provider",
+    "PatternList",
+    "get_pattern_list",
+    "get_pattern",
+    "find_provider",
 ]

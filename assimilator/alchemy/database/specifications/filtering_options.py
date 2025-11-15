@@ -3,8 +3,7 @@ from typing import Callable, Any
 from sqlalchemy import column
 from sqlalchemy.sql.elements import ColumnClause
 
-from assimilator.core.database.specifications.filtering_options import \
-    FilteringOptions, FILTERING_OPTIONS_SEPARATOR
+from assimilator.core.database.specifications.filtering_options import FilteringOptions, FILTERING_OPTIONS_SEPARATOR
 
 
 class AlchemyFilteringOptions(FilteringOptions):
@@ -70,5 +69,5 @@ class AlchemyFilteringOptions(FilteringOptions):
 
 
 __all__ = [
-    'AlchemyFilteringOptions',
+    "AlchemyFilteringOptions",
 ]

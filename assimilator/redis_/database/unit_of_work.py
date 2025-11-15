@@ -36,5 +36,5 @@ class RedisUnitOfWork(UnitOfWork):
 
 
 __all__ = [
-    'RedisUnitOfWork',
+    "RedisUnitOfWork",
 ]

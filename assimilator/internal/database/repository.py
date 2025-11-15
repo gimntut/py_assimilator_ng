@@ -25,7 +25,7 @@ class InternalRepository(Repository):
         self,
         session: dict,
         model: type[ModelT],
-        initial_query: Optional[str] = '',
+        initial_query: Optional[str] = "",
         specifications: type[InternalSpecificationList] = InternalSpecificationList,
         error_wrapper: Optional[ErrorWrapper] = None,
     ):
@@ -48,13 +48,15 @@ class InternalRepository(Repository):
             specifications=specifications,
         )
 
-        if query:   # Dict key was not provided, we must use other search parameters
+        if query:  # Dict key was not provided, we must use other search parameters
             return self.session[query]
 
-        found_models = list(self._apply_specifications(
-            query=self.session.values(),
-            specifications=specifications,
-        ))
+        found_models = list(
+            self._apply_specifications(
+                query=self.session.values(),
+                specifications=specifications,
+            )
+        )
 
         if not found_models:
             raise NotFoundError(f"{self} repository did not find an entity")
@@ -69,10 +71,12 @@ class InternalRepository(Repository):
         lazy: bool = False,
         initial_query: Optional[str] = None,
     ) -> Union[LazyCommand[List[ModelT]], List[ModelT]]:
-        return list(self._apply_specifications(
-            query=self.session.values(),
-            specifications=specifications,
-        ))
+        return list(
+            self._apply_specifications(
+                query=self.session.values(),
+                specifications=specifications,
+            )
+        )
 
     def dict_to_models(self, data: dict) -> ModelT:
         return self.model(**dict_to_internal_models(data=data, model=self.model))
@@ -104,8 +108,7 @@ class InternalRepository(Repository):
         if specifications:
             if not update_values:
                 raise InvalidQueryError(
-                    "You did not provide any update_values "
-                    "to the update() yet provided specifications"
+                    "You did not provide any update_values " "to the update() yet provided specifications"
                 )
 
             for model in self.filter(*specifications, lazy=True):
@@ -129,13 +132,17 @@ class InternalRepository(Repository):
         initial_query: Optional[str] = None,
     ) -> Union[LazyCommand[int], int]:
         if specifications:
-            return len(list(self._apply_specifications(  # We do not call filter() for list() optimization
-                query=self.session.values(),
-                specifications=specifications,
-            )))
+            return len(
+                list(
+                    self._apply_specifications(  # We do not call filter() for list() optimization
+                        query=self.session.values(),
+                        specifications=specifications,
+                    )
+                )
+            )
         return len(self.session)
 
 
 __all__ = [
-    'InternalRepository',
+    "InternalRepository",
 ]

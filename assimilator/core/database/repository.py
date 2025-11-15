@@ -1,24 +1,19 @@
-from functools import wraps
 from abc import ABC, abstractmethod
-from typing import (
-    TypeVar, Callable, Generic, final,
-    Union, Optional, Iterable, Type,
-    Collection, Tuple, Any, Dict,
-)
+from functools import wraps
+from typing import Any, Callable, Collection, Dict, Generic, Iterable, Optional, Tuple, TypeVar, Union, final
 
+from assimilator.core.database.specifications.specifications import SpecificationList, SpecificationType
 from assimilator.core.patterns.error_wrapper import ErrorWrapper
 from assimilator.core.patterns.lazy_command import LazyCommand
-from assimilator.core.database.specifications.specifications import SpecificationType, SpecificationList
 
 
 def make_lazy(func: Callable):
-
     @wraps(func)
     def make_lazy_wrapper(
         self,
         *specifications: SpecificationType,
         lazy: bool = False,
-        initial_query: QueryT = None,
+        initial_query: object = None,
     ):
         if lazy:
             return LazyCommand(func, self, *specifications, lazy=False, initial_query=initial_query)
@@ -33,7 +28,7 @@ SessionT = TypeVar("SessionT")
 SpecsT = TypeVar("SpecsT", bound=type[SpecificationList])
 
 
-class Repository(Generic[SessionT, ModelT, QueryT], ABC):
+class Repository(Generic[SessionT, ModelT, QueryT, SpecsT], ABC):
     def __init__(
         self,
         session: SessionT,
@@ -59,9 +54,7 @@ class Repository(Generic[SessionT, ModelT, QueryT], ABC):
 
     @final
     def _check_obj_is_specification(
-        self,
-        obj: ModelT,
-        specifications: Iterable[SpecificationType]
+        self, obj: ModelT, specifications: Iterable[SpecificationType]
     ) -> Tuple[Optional[ModelT], Iterable[SpecificationType]]:
         """
         This function is called for parts of the code that use both obj and *specifications.
@@ -69,13 +62,13 @@ class Repository(Generic[SessionT, ModelT, QueryT], ABC):
         """
 
         if not isinstance(obj, self.model) and (obj is not None):
-            return None, (obj, *specifications)     # obj is specification
+            return None, (obj, *specifications)  # obj is specification
 
         return obj, specifications
 
     @property
     def specs(self) -> SpecsT:
-        """ That property is used to shorten the full name of the self.specifications. """
+        """That property is used to shorten the full name of the self.specifications."""
         return self.specifications
 
     def get_initial_query(self, override_query: Optional[QueryT] = None) -> QueryT:
@@ -99,7 +92,8 @@ class Repository(Generic[SessionT, ModelT, QueryT], ABC):
 
     @final
     def _apply_specifications(
-        self, query: Union[QueryT, None],
+        self,
+        query: Union[QueryT, None],
         specifications: Iterable[SpecificationType],
     ) -> QueryT:
         query = self.get_initial_query(query)
@@ -164,7 +158,7 @@ class Repository(Generic[SessionT, ModelT, QueryT], ABC):
 
 
 __all__ = [
-    'LazyCommand',
-    'Repository',
-    'make_lazy',
+    "LazyCommand",
+    "Repository",
+    "make_lazy",
 ]

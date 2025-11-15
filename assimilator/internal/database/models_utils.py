@@ -22,8 +22,7 @@ def dict_to_internal_models(data: dict, model: type[BaseModel]) -> dict:
 
         if not isinstance(value, dict):
             data[field_name] = [
-                field_type(**dict_to_internal_models(data=val_part, model=field_type))
-                for val_part in value
+                field_type(**dict_to_internal_models(data=val_part, model=field_type)) for val_part in value
             ]
         else:
             data[field_name] = field_type(**value)

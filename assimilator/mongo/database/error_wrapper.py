@@ -20,4 +20,4 @@ class MongoErrorWrapper(ErrorWrapper):
         )
 
 
-__all__ = ['MongoErrorWrapper']
+__all__ = ["MongoErrorWrapper"]

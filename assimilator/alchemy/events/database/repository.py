@@ -34,5 +34,5 @@ class AlchemyOutboxRepository(AlchemyRepository):
 
 
 __all__ = [
-    'AlchemyOutboxRepository',
+    "AlchemyOutboxRepository",
 ]

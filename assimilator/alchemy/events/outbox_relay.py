@@ -51,6 +51,6 @@ class AlchemyOutboxRelay(OutboxRelay):
 
 
 __all__ = [
-    'create_outbox_event_model',
-    'AlchemyOutboxRelay',
+    "create_outbox_event_model",
+    "AlchemyOutboxRelay",
 ]

@@ -33,7 +33,7 @@ class RedisRepository(Repository):
         self,
         session: Redis,
         model: type[RedisModelT],
-        initial_query: Optional[str] = '',
+        initial_query: Optional[str] = "",
         specifications: type[SpecificationList] = InternalSpecificationList,
         error_wrapper: Optional[ErrorWrapper] = None,
         use_double_filter: bool = True,
@@ -43,10 +43,7 @@ class RedisRepository(Repository):
             model=model,
             initial_query=initial_query,
             specifications=specifications,
-            error_wrapper=error_wrapper or ErrorWrapper(
-                default_error=DataLayerError,
-                skipped_errors=(NotFoundError,)
-            )
+            error_wrapper=error_wrapper or ErrorWrapper(default_error=DataLayerError, skipped_errors=(NotFoundError,)),
         )
         self.transaction = session
         self.use_double_specifications = use_double_filter
@@ -57,23 +54,23 @@ class RedisRepository(Repository):
         lazy: bool = False,
         initial_query: Optional[str] = None,
     ) -> Union[LazyCommand[RedisModelT], RedisModelT]:
-        query = self._apply_specifications(query=initial_query, specifications=specifications) or '*'
+        query = self._apply_specifications(query=initial_query, specifications=specifications) or "*"
         found_objects = self.session.mget(self.session.keys(query))
 
         if not all(found_objects):
             raise NotFoundError(f"{self} repository get() did not find any results with this query: {query}")
 
-        parsed_objects = list(self._apply_specifications(
-            query=[self.model.loads(found_object) for found_object in found_objects],
-            specifications=specifications,
-        ))
+        parsed_objects = list(
+            self._apply_specifications(
+                query=[self.model.loads(found_object) for found_object in found_objects],
+                specifications=specifications,
+            )
+        )
 
         if not parsed_objects:
-            raise NotFoundError(f"{self} repository get() did not find "
-                                f"any results with this query: {query}")
+            raise NotFoundError(f"{self} repository get() did not find " f"any results with this query: {query}")
         elif len(parsed_objects) != 1:
-            raise MultipleResultsError(f"{self} repository get() did not"
-                                       f" find any results with this query: {query}")
+            raise MultipleResultsError(f"{self} repository get() did not" f" find any results with this query: {query}")
 
         return parsed_objects[0]
 
@@ -84,10 +81,13 @@ class RedisRepository(Repository):
         initial_query: Optional[str] = None,
     ) -> Union[LazyCommand[List[RedisModelT]], List[RedisModelT]]:
         if self.use_double_specifications and specifications:
-            key_name = self._apply_specifications(
-                query=initial_query,
-                specifications=specifications,
-            ) or "*"
+            key_name = (
+                self._apply_specifications(
+                    query=initial_query,
+                    specifications=specifications,
+                )
+                or "*"
+            )
         else:
             key_name = "*"
 
@@ -110,11 +110,11 @@ class RedisRepository(Repository):
         self.transaction.set(
             name=obj.id,
             value=obj.json(),
-            ex=getattr(obj, 'expire_in', None),     # for Pydantic model compatability
-            px=getattr(obj, 'expire_in_px', None),
-            nx=getattr(obj, 'only_create', False),
-            xx=getattr(obj, 'only_update', False),
-            keepttl=getattr(obj, 'keep_ttl', False),
+            ex=getattr(obj, "expire_in", None),  # for Pydantic model compatability
+            px=getattr(obj, "expire_in_px", None),
+            nx=getattr(obj, "only_create", False),
+            xx=getattr(obj, "only_update", False),
+            keepttl=getattr(obj, "keep_ttl", False),
         )
         return obj
 
@@ -137,8 +137,7 @@ class RedisRepository(Repository):
         if specifications:
             if not update_values:
                 raise InvalidQueryError(
-                    "You did not provide any update_values "
-                    "to the update() yet provided specifications"
+                    "You did not provide any update_values " "to the update() yet provided specifications"
                 )
 
             models = self.filter(*specifications, lazy=False)
@@ -180,5 +179,5 @@ class RedisRepository(Repository):
 
 
 __all__ = [
-    'RedisRepository',
+    "RedisRepository",
 ]

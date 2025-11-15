@@ -13,7 +13,7 @@ def create_repository(
     session: Any,
     kwargs_repository: Dict[str, Any] = None,
 ) -> Repository:
-    repository_cls: type[Repository] = get_pattern(provider=provider, pattern_name='repository')
+    repository_cls: type[Repository] = get_pattern(provider=provider, pattern_name="repository")
     return repository_cls(model=model, session=session, **(kwargs_repository or {}))
 
 
@@ -30,7 +30,7 @@ def create_uow(
         session=session,
         kwargs_repository=kwargs_repository,
     )
-    uow_cls: type[UnitOfWork] = get_pattern(provider=provider, pattern_name='uow')
+    uow_cls: type[UnitOfWork] = get_pattern(provider=provider, pattern_name="uow")
     return uow_cls(repository=repository, **(kwargs_uow or {}))
 
 
@@ -48,5 +48,5 @@ def create_crud(
         kwargs_repository=kwargs_repository,
         kwargs_uow=kwargs_uow,
     )
-    crud_cls: type[CRUDService] = get_pattern(provider=provider, pattern_name='crud')
+    crud_cls: type[CRUDService] = get_pattern(provider=provider, pattern_name="crud")
     return crud_cls(uow=uow)

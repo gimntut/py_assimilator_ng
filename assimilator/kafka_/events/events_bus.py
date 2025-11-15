@@ -18,7 +18,7 @@ class KafkaEventConsumer(EventConsumer):
         self.consumer.close()
 
     def start(self):
-        """ Connected by default """
+        """Connected by default"""
 
     def consume(self) -> Iterable[ExternalEvent]:
         self.consumer.subscribe(self.topics)
@@ -47,13 +47,13 @@ class KafkaEventProducer(EventProducer):
                 raise EventProducingError(exc)
 
     def start(self):
-        """ Already started """
+        """Already started"""
 
     def close(self):
         self.producer.close()
 
 
 __all__ = [
-    'KafkaEventConsumer',
-    'KafkaEventProducer',
+    "KafkaEventConsumer",
+    "KafkaEventProducer",
 ]
