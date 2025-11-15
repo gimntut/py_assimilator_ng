@@ -5,17 +5,20 @@ Some concepts like Dependency Injection are not followed here.
 You will see how your code becomes easier step-by-step by using CRUDService pattern.
 """
 
-from sqlalchemy.orm import declarative_base, sessionmaker
-from sqlalchemy import create_engine, Column, Integer, String, Float
+from sqlalchemy import Column, Float, Integer, String, create_engine
+from sqlalchemy.orm import DeclarativeBase, sessionmaker
+
 from assimilator.core.usability.pattern_creator import create_crud
 from assimilator.core.usability.registry import find_provider
 
-
-find_provider('assimilator.alchemy')    # Import SQLAlchemy patterns
+find_provider("assimilator.alchemy")  # Import SQLAlchemy patterns
 
 # Firstly, we need to create our User model. That code is just normal SQLAlchemy:
 engine = create_engine(url="sqlite:///:memory:")
-Base = declarative_base()
+
+
+class Base(DeclarativeBase):
+    pass
 
 
 class AlchemyUser(Base):
@@ -35,19 +38,21 @@ session_creator = sessionmaker(bind=engine)
 
 # Now, we use PyAssimilator to create CRUDService pattern. It allows us to do Create/Read/Update/Delete operations
 crud = create_crud(
-    provider='alchemy',         # Provider is the external library that we are using. In our case - SQLAlchemy
-    model=AlchemyUser,          # Model is the main entity that we will be working with.
+    provider="alchemy",  # Provider is the external library that we are using. In our case - SQLAlchemy
+    model=AlchemyUser,  # Model is the main entity that we will be working with.
     session=session_creator(),  # Session is the connection to the data source. In our case - SQLite
 )
 
 
 def create_user():
     # Now, let's create a function that will allow us to add a user
-    new_user = crud.create({    # Create a user
-        "username": "Andrey",
-        "email": "python.on.papyrus@gmail.com",
-        "balance": 1000000,
-    })
+    new_user = crud.create(
+        {  # Create a user
+            "username": "Andrey",
+            "email": "python.on.papyrus@gmail.com",
+            "balance": 1000000,
+        }
+    )
 
     # The user is created! Let's print our username:
     print("Hello,", new_user.username)
@@ -72,6 +77,6 @@ I hope you liked it and will use PyAssimilator in your projects!
 """
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     create_user()
     get_user()
