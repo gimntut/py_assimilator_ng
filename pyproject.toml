@@ -20,7 +20,7 @@ maintainers = [
 keywords = ["DDD", "Domain-driven design", "Database", "Events", "Architecture", "Patterns", "Backend"]
 description = "The best Domain-driven design patterns for your projects"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 license = "MIT"
 
 classifiers = [
@@ -81,9 +81,25 @@ dev = [
 ]
 
 [tool.black]
-target-version = ['py38','py310','py311','py312','py313']
+target-version = ['py310','py311','py312','py313']
 line-length = 120
 
 [tool.ruff]
 line-length = 120
-target-version = "py38"
+target-version = "py310"
+include = ["pyproject.toml", "assimilator/**/*.py", "examples/**/*.py", "tests/**/*.py"]
+
+[tool.basedpyright]
+include = ["assimilator"]
+defineConstant = { DEBUG = true }
+pythonVersion = "3.8"
+pythonPlatform = "Linux"
+venvPath = ".venv"
+executionEnvironments = [
+  { root = "assimilator" },
+  { root = "examples" }
+]
+### report settings ###
+reportMissingImports = "error"
+reportMissingTypeStubs = false
+reportImplicitOverride="none"
