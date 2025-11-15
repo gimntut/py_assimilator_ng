@@ -92,7 +92,7 @@ include = ["pyproject.toml", "assimilator/**/*.py", "examples/**/*.py", "tests/*
 [tool.basedpyright]
 include = ["assimilator"]
 defineConstant = { DEBUG = true }
-pythonVersion = "3.8"
+pythonVersion = "3.10"
 pythonPlatform = "Linux"
 venvPath = ".venv"
 executionEnvironments = [
