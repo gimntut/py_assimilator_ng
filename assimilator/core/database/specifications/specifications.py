@@ -1,6 +1,6 @@
 from functools import wraps
 from abc import ABC
-from typing import Callable, TypeVar, Type, Any, Union
+from typing import Callable, TypeVar, Any
 
 from assimilator.core.database.specifications.filtering_options import FilteringOptions
 from assimilator.core.database.specifications.types import (
@@ -61,7 +61,7 @@ class SpecificationList:
     only: OnlySpecificationProtocol
 
 
-SpecificationType = Union[Callable, Specification]
+SpecificationType = Callable | Specification
 
 
 __all__ = [

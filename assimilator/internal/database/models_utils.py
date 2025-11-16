@@ -1,11 +1,9 @@
-from typing import Type, Union
-
 from pydantic import BaseModel as PydanticBaseModel
 
 from assimilator.core.database.models import BaseModel
 
 
-def get_model_relationship(model: type[BaseModel], field_name: str) -> Union[type[BaseModel], None]:
+def get_model_relationship(model: type[BaseModel], field_name: str) -> type[BaseModel] | None:
     try:
         return model.__fields__.get(field_name).type_
     except AttributeError:

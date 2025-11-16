@@ -1,4 +1,4 @@
-from typing import Type, Optional
+from typing import Optional
 
 from sqlalchemy import Table
 from sqlalchemy.orm import Query

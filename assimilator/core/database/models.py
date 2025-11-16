@@ -18,8 +18,8 @@ from assimilator.core.exceptions import ParsingError
 
 
 T = TypeVar("T", bound="BaseModel")
-AbstractSetIntStr = AbstractSet[Union[int, str]]
-MappingIntStrAny = Mapping[Union[int, str], Any]
+AbstractSetIntStr = AbstractSet[int | str]
+MappingIntStrAny = Mapping[int | str, Any]
 
 
 class BaseModel(PydanticBaseModel):

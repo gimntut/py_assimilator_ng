@@ -1,10 +1,10 @@
-from typing import List, Iterable, Union, Optional, Collection
+from typing import List, Iterable, Optional, Collection
 
 from assimilator.core.database import specification, SpecificationList, BaseModel
 from assimilator.internal.database.specifications.filter_specifications import InternalFilter
 from assimilator.internal.database.specifications.utils import find_model_value
 
-QueryT = Union[str, List[BaseModel]]
+QueryT = str | List[BaseModel]
 internal_filter = InternalFilter
 
 

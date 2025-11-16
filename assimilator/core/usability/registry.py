@@ -1,5 +1,5 @@
 import importlib
-from typing import Dict, Type, Union
+from typing import Dict
 
 from pydantic import BaseModel
 
@@ -40,7 +40,7 @@ def unregister_provider(provider: str):
         raise ProviderNotFoundError(f"Provider {provider} was not found")
 
 
-def get_pattern(provider: str, pattern_name: str) -> type[Union[Repository, UnitOfWork, CRUDService]]:
+def get_pattern(provider: str, pattern_name: str) -> type[Repository | UnitOfWork | CRUDService]:
     try:
         pattern_cls = getattr(registry[provider], pattern_name, None)
     except KeyError:

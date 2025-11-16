@@ -1,4 +1,4 @@
-from typing import TypeVar, Any, Type, Dict
+from typing import TypeVar, Any, Dict
 
 from assimilator.core.usability.registry import get_pattern
 from assimilator.core.database import Repository, UnitOfWork

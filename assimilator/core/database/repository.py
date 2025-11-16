@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from functools import wraps
-from typing import Any, Callable, Collection, Dict, Generic, Iterable, Optional, Tuple, TypeVar, Union, final
+from typing import Any, Callable, Collection, Dict, Generic, Iterable, Optional, Tuple, TypeVar, final
 
 from assimilator.core.database.specifications.specifications import SpecificationList, SpecificationType
 from assimilator.core.patterns.error_wrapper import ErrorWrapper
@@ -93,7 +93,7 @@ class Repository(Generic[SessionT, ModelT, QueryT, SpecsT], ABC):
     @final
     def _apply_specifications(
         self,
-        query: Union[QueryT, None],
+        query: QueryT | None,
         specifications: Iterable[SpecificationType],
     ) -> QueryT:
         query = self.get_initial_query(query)
@@ -109,7 +109,7 @@ class Repository(Generic[SessionT, ModelT, QueryT, SpecsT], ABC):
         *specifications: SpecificationType,
         lazy: bool = False,
         initial_query: QueryT = None,
-    ) -> Union[ModelT, LazyCommand[ModelT]]:
+    ) -> ModelT | LazyCommand[ModelT]:
         raise NotImplementedError("get() is not implemented()")
 
     @abstractmethod
@@ -118,7 +118,7 @@ class Repository(Generic[SessionT, ModelT, QueryT, SpecsT], ABC):
         *specifications: SpecificationType,
         lazy: bool = False,
         initial_query: QueryT = None,
-    ) -> Union[Collection[ModelT], LazyCommand[Collection[ModelT]]]:
+    ) -> Collection[ModelT] | LazyCommand[Collection[ModelT]]:
         raise NotImplementedError("filter() is not implemented()")
 
     @abstractmethod
@@ -147,7 +147,7 @@ class Repository(Generic[SessionT, ModelT, QueryT, SpecsT], ABC):
         *specifications: SpecificationType,
         lazy: bool = False,
         initial_query: QueryT = None,
-    ) -> Union[LazyCommand[int], int]:
+    ) -> LazyCommand[int] | int:
         raise NotImplementedError("count() is not implemented in the repository")
 
     def __str__(self):

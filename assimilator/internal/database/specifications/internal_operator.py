@@ -2,7 +2,7 @@ import operator
 import re
 from functools import wraps
 from numbers import Number
-from typing import Any, Callable, Union, Literal
+from typing import Any, Callable, Literal
 
 from assimilator.core.database.models import BaseModel
 from assimilator.core.database.specifications.filtering_options import FILTERING_OPTIONS_SEPARATOR
@@ -58,11 +58,11 @@ def lte(field: str, value: Number):
     return find_attribute(func=operator.le, field=field, value=value)
 
 
-def not_(field: str, value: Union[Literal[True], Literal[False], Literal[None]]):
+def not_(field: str, value: Literal[True] | Literal[False] | Literal[None]):
     return find_attribute(func=operator.not_, field=field, value=value)
 
 
-def is_(field: str, value: Union[Literal[True], Literal[False], Literal[None]]):
+def is_(field: str, value: Literal[True] | Literal[False] | Literal[None]):
     return find_attribute(func=operator.is_, field=field, value=value)
 
 
@@ -79,7 +79,6 @@ def like(field: str, value: str):
 
 
 def invert(func: Callable):
-
     @wraps(func)
     def invert_wrapper(model):
         return not func(model)

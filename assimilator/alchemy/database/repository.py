@@ -1,4 +1,4 @@
-from typing import Type, Union, Optional, TypeVar, Collection
+from typing import Optional, TypeVar, Collection
 
 from sqlalchemy import func, select, update, delete
 from sqlalchemy.orm import Session, Query
@@ -40,7 +40,7 @@ class AlchemyRepository(Repository):
         *specifications: SpecificationType,
         lazy: bool = False,
         initial_query: Query = None,
-    ) -> Union[AlchemyModelT, LazyCommand[AlchemyModelT]]:
+    ) -> AlchemyModelT | LazyCommand[AlchemyModelT]:
         query = self._apply_specifications(
             query=initial_query,
             specifications=specifications,
@@ -52,7 +52,7 @@ class AlchemyRepository(Repository):
         *specifications: SpecificationType,
         lazy: bool = False,
         initial_query: Query = None,
-    ) -> Union[Collection[AlchemyModelT], LazyCommand[Collection[AlchemyModelT]]]:
+    ) -> Collection[AlchemyModelT] | LazyCommand[Collection[AlchemyModelT]]:
         query = self._apply_specifications(
             query=initial_query,
             specifications=specifications,
@@ -118,7 +118,7 @@ class AlchemyRepository(Repository):
 
     def count(
         self, *specifications: SpecificationType, lazy: bool = False, initial_query: Query = None
-    ) -> Union[LazyCommand[int], int]:
+    ) -> LazyCommand[int] | int:
         primary_keys = inspect(self.model).primary_key
 
         if not primary_keys:

@@ -4,25 +4,24 @@ import pymongo
 from redis.client import Redis
 from sqlalchemy.orm import sessionmaker
 
-from assimilator.alchemy.database import AlchemyUnitOfWork, AlchemyRepository
+from assimilator.alchemy.database import AlchemyRepository, AlchemyUnitOfWork
 from assimilator.internal.database import InternalRepository, InternalUnitOfWork
-from assimilator.redis_.database import RedisRepository, RedisUnitOfWork
 from assimilator.mongo.database import MongoRepository, MongoUnitOfWork
-
+from assimilator.redis_.database import RedisRepository, RedisUnitOfWork
 from examples.complex_database.models import (
-    engine,
+    AlchemyBalanceCurrency,
     AlchemyUser,
     AlchemyUserBalance,
-    AlchemyBalanceCurrency,
-    InternalUser,
     InternalBalance,
     InternalCurrency,
-    RedisUser,
+    InternalUser,
+    MongoBalance,
+    MongoCurrency,
+    MongoUser,
     RedisBalance,
     RedisCurrency,
-    MongoUser,
-    MongoCurrency,
-    MongoBalance,
+    RedisUser,
+    engine,
 )
 
 if len(sys.argv) == 1 or sys.argv[1] == "alchemy":

@@ -1,9 +1,9 @@
 import sys
 from functools import wraps
-from typing import Dict, Type, Optional, Callable, Container, Union
+from typing import Dict, Optional, Callable, Container
 
 
-ErrorT = Union[Callable[[Exception], Exception], type[Exception]]
+ErrorT = Callable[[Exception], Exception] | type[Exception]
 
 
 class ErrorWrapper:

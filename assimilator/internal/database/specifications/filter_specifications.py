@@ -6,7 +6,7 @@ from assimilator.core.database import FilterSpecification
 from assimilator.internal.database.specifications.internal_operator import invert
 from assimilator.internal.database.specifications.filtering_options import InternalFilteringOptions
 
-QueryT = Union[str, List[BaseModel]]
+QueryT = str | List[BaseModel]
 
 
 class InternalFilter(FilterSpecification):
@@ -23,7 +23,7 @@ class InternalFilter(FilterSpecification):
             **named_filters,
         )
 
-    def __call__(self, query: QueryT, **context) -> Union[str, Generator[BaseModel, Any, None]]:
+    def __call__(self, query: QueryT, **context) -> str | Generator[BaseModel, Any, None]:
         if isinstance(query, str):
             return f'{query}{"".join(str(filter_) for filter_ in self.text_filters)}'
         elif not self.filters:
@@ -53,7 +53,7 @@ class CompositeFilter(InternalFilter):
         self.second = second
         self.operation = operation
 
-    def __call__(self, query: QueryT, **context) -> Union[str, QueryT]:
+    def __call__(self, query: QueryT, **context) -> str | QueryT:
         if isinstance(query, str):
             first_result = self.first(query=query, **context)
             second_result = self.second(query=query, **context)

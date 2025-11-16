@@ -1,4 +1,4 @@
-from typing import Type, Union, Optional, TypeVar, List
+from typing import Optional, TypeVar, List
 
 from assimilator.core.patterns.error_wrapper import ErrorWrapper
 from assimilator.internal.database.error_wrapper import InternalErrorWrapper
@@ -42,7 +42,7 @@ class InternalRepository(Repository):
         *specifications: SpecificationType,
         lazy: bool = False,
         initial_query: Optional[str] = None,
-    ) -> Union[LazyCommand[ModelT], ModelT]:
+    ) -> LazyCommand[ModelT] | ModelT:
         query = self._apply_specifications(
             query=initial_query,
             specifications=specifications,
@@ -70,7 +70,7 @@ class InternalRepository(Repository):
         *specifications: SpecificationType,
         lazy: bool = False,
         initial_query: Optional[str] = None,
-    ) -> Union[LazyCommand[List[ModelT]], List[ModelT]]:
+    ) -> LazyCommand[List[ModelT]] | List[ModelT]:
         return list(
             self._apply_specifications(
                 query=self.session.values(),
@@ -130,7 +130,7 @@ class InternalRepository(Repository):
         *specifications: SpecificationType,
         lazy: bool = False,
         initial_query: Optional[str] = None,
-    ) -> Union[LazyCommand[int], int]:
+    ) -> LazyCommand[int] | int:
         if specifications:
             return len(
                 list(

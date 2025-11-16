@@ -1,12 +1,12 @@
-from typing import ClassVar, Any, Union, AbstractSet, Mapping, Dict
+from typing import ClassVar, Any, AbstractSet, Mapping, Dict
 
 from bson import ObjectId
 from pydantic import Field
 
 from assimilator.core.database.models import BaseModel
 
-AbstractSetIntStr = AbstractSet[Union[int, str]]
-MappingIntStrAny = Mapping[Union[int, str], Any]
+AbstractSetIntStr = AbstractSet[int | str]
+MappingIntStrAny = Mapping[int | str, Any]
 
 
 class MongoModel(BaseModel):

@@ -1,33 +1,32 @@
 import json
-from typing import Type, Union, Optional, TypeVar, List
+from typing import Optional, TypeVar, List
 
 from redis import Redis
 from redis.client import Pipeline
 
-from assimilator.core.patterns.error_wrapper import ErrorWrapper
 from assimilator.core.database import (
+    BaseModel,
+    LazyCommand,
+    Repository,
     SpecificationList,
     SpecificationType,
-    Repository,
-    LazyCommand,
 )
-from assimilator.internal.database import InternalSpecificationList
-from assimilator.internal.database.models_utils import dict_to_internal_models
 from assimilator.core.database.exceptions import (
     DataLayerError,
-    NotFoundError,
     InvalidQueryError,
     MultipleResultsError,
+    NotFoundError,
 )
-from assimilator.core.database import BaseModel
+from assimilator.core.patterns.error_wrapper import ErrorWrapper
+from assimilator.internal.database import InternalSpecificationList
+from assimilator.internal.database.models_utils import dict_to_internal_models
 
 RedisModelT = TypeVar("RedisModelT", bound=BaseModel)
 
 
 class RedisRepository(Repository):
     session: Redis
-    transaction: Union[Pipeline, Redis]
-    model: type[RedisModelT]
+    transaction: Pipeline | Redis
 
     def __init__(
         self,
@@ -53,7 +52,7 @@ class RedisRepository(Repository):
         *specifications: SpecificationType,
         lazy: bool = False,
         initial_query: Optional[str] = None,
-    ) -> Union[LazyCommand[RedisModelT], RedisModelT]:
+    ) -> LazyCommand[RedisModelT] | RedisModelT:
         query = self._apply_specifications(query=initial_query, specifications=specifications) or "*"
         found_objects = self.session.mget(self.session.keys(query))
 
@@ -80,7 +79,7 @@ class RedisRepository(Repository):
         *specifications: SpecificationType,
         lazy: bool = False,
         initial_query: Optional[str] = None,
-    ) -> Union[LazyCommand[List[RedisModelT]], List[RedisModelT]]:
+    ) -> LazyCommand[List[RedisModelT]] | List[RedisModelT]:
         if self.use_double_specifications and specifications:
             key_name = (
                 self._apply_specifications(
@@ -168,7 +167,7 @@ class RedisRepository(Repository):
         *specifications: SpecificationType,
         lazy: bool = False,
         initial_query: Optional[str] = None,
-    ) -> Union[LazyCommand[int], int]:
+    ) -> LazyCommand[int] | int:
         if not specifications:
             return self.session.dbsize()
 
