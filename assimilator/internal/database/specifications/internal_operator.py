@@ -75,7 +75,7 @@ def regex(field: str, value: str):
 
 
 def like(field: str, value: str):
-    return regex(field, f'^{value.replace("%", ".*?")}$')
+    return regex(field, f"^{value.replace('%', '.*?')}$")
 
 
 def invert(func: Callable):

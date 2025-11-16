@@ -70,7 +70,7 @@ class AlchemyRepository(Repository):
         if specifications:
             if not update_values:
                 raise InvalidQueryError(
-                    "You did not provide any update_values " "to the update() yet provided specifications"
+                    "You did not provide any update_values to the update() yet provided specifications"
                 )
 
             query = self._apply_specifications(

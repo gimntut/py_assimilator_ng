@@ -25,7 +25,7 @@ class InternalFilter(FilterSpecification):
 
     def __call__(self, query: QueryT, **context) -> str | Generator[BaseModel, Any, None]:
         if isinstance(query, str):
-            return f'{query}{"".join(str(filter_) for filter_ in self.text_filters)}'
+            return f"{query}{''.join(str(filter_) for filter_ in self.text_filters)}"
         elif not self.filters:
             return query
 
@@ -57,7 +57,7 @@ class CompositeFilter(InternalFilter):
         if isinstance(query, str):
             first_result = self.first(query=query, **context)
             second_result = self.second(query=query, **context)
-            return f'{query}{first_result.replace(query, "")}{second_result.replace(query, "")}'
+            return f"{query}{first_result.replace(query, '')}{second_result.replace(query, '')}"
 
         first_result = self.first(query=query, **context)
         second_result = self.second(query=query, **context)
