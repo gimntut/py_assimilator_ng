@@ -1,20 +1,25 @@
 import operator
-
 import os
+from typing import Protocol
 
 os.environ["PY_ASSIMILATOR_MESSAGE"] = "False"
 
-from assimilator.core.database import filter_
-from assimilator.core.patterns import LazyCommand
-from assimilator.redis_.database import RedisRepository
-from assimilator.core.database import UnitOfWork, Repository
-from assimilator.mongo.database import MongoRepository
-from assimilator.core.database import NotFoundError
-from assimilator.internal.database import InternalRepository
 from assimilator.alchemy.database import AlchemyRepository
+from assimilator.core.database import NotFoundError, Repository, UnitOfWork, filter_
+from assimilator.core.patterns import LazyCommand
+from assimilator.internal.database import InternalRepository
 from assimilator.internal.database.specifications.filtering_options import find_attribute
+from assimilator.mongo.database import MongoRepository
+from assimilator.redis_.database import RedisRepository
+from examples.simple_database.dependencies import User, get_uow
 
-from dependencies import get_uow, User
+
+class BaseUser(Protocol):
+    username: str
+    email: str
+    balance: float
+
+    def __init__(self, *, username: str, email: str, balance: float = 0, upsert: bool = False): ...
 
 
 def create_user__kwargs(uow: UnitOfWork):
@@ -29,7 +34,7 @@ def create_user__kwargs(uow: UnitOfWork):
 
 def create_user_model(uow: UnitOfWork):
     with uow:
-        user = User(
+        user = User(  # type: ignore
             username="Andrey-2",
             email="python.on.papyrus@gmail.com",
             balance=2000,
@@ -64,7 +69,7 @@ def read_user_direct(username: str, repository: Repository):
     else:
         raise ValueError("Direct repository filter not found")
 
-    print("User direct:", user.id, user.username, user.email, user.balance)
+    print("User direct:", user.id, user.username, user.email, user.balance)  # type: ignore
     return user
 
 
@@ -72,7 +77,7 @@ def update_user(uow: UnitOfWork):
     with uow:
         user = uow.repository.get(filter_(username="Andrey"))
 
-        user.balance += 1000
+        user.balance += 1000  # type: ignore
         uow.repository.update(user)
         uow.commit()
 
@@ -100,7 +105,7 @@ def create_many_users_direct(uow: UnitOfWork):
     with uow:
         for i in range(100):
             uow.repository.save(
-                User(
+                User(  # type: ignore
                     username=f"User-{i}",
                     email=f"user-{i}@py_assimilator.com",
                     balance=i * 100,
@@ -125,7 +130,7 @@ def count_users(repository: Repository):
 
 
 def filter_users_lazy(repository: Repository):
-    users: LazyCommand[User] = repository.filter(filter_(balance__eq=0), lazy=True)
+    users: LazyCommand[BaseUser] = repository.filter(filter_(balance__eq=0), lazy=True)
 
     for user in users:  # Queries the database here
         print("User without any money:", user.username, user.balance)
@@ -163,7 +168,7 @@ def create_users_error(uow: UnitOfWork):
             balance=0,
         )
 
-        1 / 0  # Error. Changes are discarded
+        1 / 0  # Error. Changes are discarded  # pyright: ignore[reportUnusedExpression]
         uow.commit()
 
 

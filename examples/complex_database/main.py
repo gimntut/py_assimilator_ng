@@ -1,13 +1,12 @@
-from assimilator.mongo.database.repository import MongoRepository
+from dependencies import Balance, Currency, User, get_uow
 
-from assimilator.core.patterns import LazyCommand
 from assimilator.alchemy.database import AlchemyRepository
-from assimilator.core.database import UnitOfWork, Repository
+from assimilator.core.database import Repository, UnitOfWork
+from assimilator.core.database.specifications.adaptive import filter_, join, only, order
+from assimilator.core.patterns import LazyCommand
 from assimilator.internal.database import InternalRepository, eq
+from assimilator.mongo.database.repository import MongoRepository
 from assimilator.redis_.database import RedisRepository
-from assimilator.core.database.specifications.adaptive import join, only, filter_, order
-
-from dependencies import get_uow, User, Balance, Currency
 
 
 def create_user__kwargs(uow: UnitOfWork):
