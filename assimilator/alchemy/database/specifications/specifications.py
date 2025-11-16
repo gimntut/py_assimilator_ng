@@ -1,16 +1,16 @@
 from itertools import zip_longest
-from typing import Collection, Optional, Iterable, Any, Dict, Callable, Union
+from typing import Any, Callable, Collection, Iterable, Optional, Union
 
-from sqlalchemy.orm import load_only, Load
-from sqlalchemy import column, desc, and_, or_, not_, Select, inspect
+from sqlalchemy import Select, and_, column, desc, inspect, not_, or_
+from sqlalchemy.orm import Load, load_only
 
 from assimilator.alchemy.database.model_utils import get_model_from_relationship
 from assimilator.alchemy.database.specifications.filtering_options import AlchemyFilteringOptions
 from assimilator.core.database.specifications.specifications import (
-    specification,
+    FilterSpecification,
     SpecificationList,
     SpecificationType,
-    FilterSpecification,
+    specification,
 )
 
 
@@ -31,8 +31,9 @@ class AlchemyFilter(FilterSpecification):
         return CompositeFilter(self, func=not_)
 
     def parse_filters(self, model):
+        assert isinstance(self.filtering_options, AlchemyFilteringOptions)
         self.filtering_options.table_name = str(inspect(model).selectable)
-        named_filters = list(filter_ for filter_ in self.filters if isinstance(filter_, Dict))
+        named_filters = list(filter_ for filter_ in self.filters if isinstance(filter_, dict))
 
         for filter_ in named_filters:
             for field, value in filter_.items():
@@ -100,7 +101,7 @@ def alchemy_paginate(
 @specification
 def alchemy_join(
     *targets: Collection,
-    join_args: Iterable[dict] = None,
+    join_args: Iterable[dict] | None = None,
     query: Select,
     **context,
 ) -> Select:

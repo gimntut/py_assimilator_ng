@@ -1,4 +1,6 @@
+from complex_database.dependencies import BaseUser
 from dependencies import Balance, Currency, User, get_uow
+from pymongo.cursor import Sequence
 
 from assimilator.alchemy.database import AlchemyRepository
 from assimilator.core.database import Repository, UnitOfWork
@@ -59,7 +61,7 @@ def create_user_model(uow: UnitOfWork):
 
 
 def read_user(username: str, balance: int, repository: Repository):
-    user = repository.get(
+    user: BaseUser = repository.get(  # type: ignore
         join("balances", "balances.currency"),
         filter_(
             username__eq=username,
@@ -71,27 +73,28 @@ def read_user(username: str, balance: int, repository: Repository):
     )
     print("User:", user.id, user.username, user.email)
 
-    for balance in user.balances:
-        print(f"User {user.username} balance: ", balance.currency, balance.balance)
+    for blnc in user.balances:
+        print(f"User {user.username} balance: ", blnc.currency, blnc.balance)
 
     return user
 
 
 def read_user_direct(username: str, repository: Repository):
+    user: BaseUser
     if isinstance(repository, AlchemyRepository):  # Awful! Try to use filtering options
-        user = repository.get(
+        user = repository.get(  # type: ignore
             repository.specs.join("balances"),
             repository.specs.filter(User.username == username),
         )
     elif isinstance(repository, (InternalRepository, RedisRepository)):
-        user = repository.get(
+        user = repository.get(  # type: ignore
             repository.specs.filter(
                 eq("username", username),
                 # will call model.username == username for every model
             )
         )
     elif isinstance(repository, MongoRepository):
-        user = repository.get(repository.specs.filter({"username": username}))
+        user = repository.get(repository.specs.filter({"username": username}))  # type: ignore
     else:
         raise ValueError("Direct repository filter not found")
 
@@ -148,7 +151,7 @@ def create_many_users_direct(uow: UnitOfWork):
     with uow:
         for i in range(100):
             uow.repository.save(
-                User(
+                User(  # type: ignore
                     username=f"User-{i}",
                     email=f"user-{i}@py_assimilator.com",
                     balances=[
@@ -164,7 +167,7 @@ def create_many_users_direct(uow: UnitOfWork):
 
 
 def filter_users(repository: Repository):
-    users = repository.filter(
+    users: Sequence[BaseUser] = repository.filter(  # type: ignore
         join("balances"),
         order("balances.balance"),
         filter_(balances__balance__gt=50),
@@ -189,7 +192,7 @@ def count_users(repository: Repository):
 
 
 def filter_users_lazy(repository: Repository):
-    users: LazyCommand[User] = repository.filter(
+    users: LazyCommand[BaseUser] = repository.filter(  # type: ignore
         repository.specs.join("balances"),
         repository.specs.filter(balances__balance__eq=0),
         lazy=True,
@@ -232,13 +235,13 @@ if __name__ == "__main__":
     create_user__kwargs(get_uow())
     create_user_model(get_uow())
 
-    read_user(username="Andrey", balance=2000, repository=get_uow().repository)
+    read_user(username="Andrey", blnc=2000, repository=get_uow().repository)
     read_user_direct(username="Andrey-2", repository=get_uow().repository)
 
     update_user(get_uow())
-    read_user(username="Andrey", balance=3000, repository=get_uow().repository)
+    read_user(username="Andrey", blnc=3000, repository=get_uow().repository)
 
-    second_user = read_user(username="Andrey-2", balance=0, repository=get_uow().repository)
+    second_user = read_user(username="Andrey-2", blnc=0, repository=get_uow().repository)
     update_user_direct(user=second_user, uow=get_uow())
 
     create_many_users(get_uow())

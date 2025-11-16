@@ -91,7 +91,7 @@ line-length = 120
 target-version = "py310"
 include = ["pyproject.toml", "assimilator/**/*.py", "examples/**/*.py", "tests/**/*.py"]
 
-[tool.basedpyright]
+[tool.pyright]
 include = ["assimilator"]
 defineConstant = { DEBUG = true }
 pythonVersion = "3.10"

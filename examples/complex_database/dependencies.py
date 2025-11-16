@@ -1,4 +1,6 @@
 import sys
+from collections.abc import Sequence
+from typing import Protocol
 
 import pymongo
 from redis.client import Redis
@@ -23,6 +25,22 @@ from examples.complex_database.models import (
     RedisUser,
     engine,
 )
+
+
+class BaseBalance(Protocol):
+    currency: str
+    balance: int
+
+
+class BaseUser(Protocol):
+    id: str
+    username: str
+    email: str
+    balance: float
+    balances: Sequence[BaseBalance]
+
+    def __init__(self, *, username: str, email: str, balance: float = 0, id: str): ...
+
 
 if len(sys.argv) == 1 or sys.argv[1] == "alchemy":
     User = AlchemyUser
