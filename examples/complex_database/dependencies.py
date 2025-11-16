@@ -29,7 +29,7 @@ if len(sys.argv) == 1 or sys.argv[1] == "alchemy":
     Balance = AlchemyUserBalance
     Currency = AlchemyBalanceCurrency
 
-    def get_uow():
+    def get_uow():  # pyright: ignore[reportRedeclaration]
         DatabaseSession = sessionmaker(bind=engine)
         repository = AlchemyRepository(
             session=DatabaseSession(),
@@ -43,7 +43,7 @@ elif sys.argv[1] == "internal":
     Currency = InternalCurrency
     internal_session = {}
 
-    def get_uow():
+    def get_uow():  # pyright: ignore[reportRedeclaration]
         repository = InternalRepository(internal_session, model=InternalUser)
         return InternalUnitOfWork(repository)
 
@@ -53,7 +53,7 @@ elif sys.argv[1] == "redis":
     Balance = RedisBalance
     Currency = RedisCurrency
 
-    def get_uow():
+    def get_uow():  # pyright: ignore[reportRedeclaration]
         repository = RedisRepository(redis_session, model=User)
         return RedisUnitOfWork(repository)
 
