@@ -78,6 +78,8 @@ mongo = [
 [dependency-groups]
 dev = [
     "black>=24.8.0",
+    "fastapi>=0.121.2",
+    "pre-commit>=4.4.0",
 ]
 
 [tool.black]
