@@ -1,4 +1,4 @@
-from typing import ClassVar, Any, AbstractSet, Mapping, Dict
+from typing import ClassVar, Any, AbstractSet, Mapping
 
 from bson import ObjectId
 from pydantic import Field
@@ -40,7 +40,7 @@ class MongoModel(BaseModel):
     def json(self, *args, by_alias: bool = True, **kwargs) -> str:
         return super(BaseModel, self).json(*args, by_alias=by_alias, **kwargs)
 
-    def dict(self, *args, by_alias: bool = True, **kwargs) -> Dict[str, Any]:
+    def dict(self, *args, by_alias: bool = True, **kwargs) -> dict[str, Any]:
         return super(BaseModel, self).dict(*args, by_alias=by_alias, **kwargs)
 
 

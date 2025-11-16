@@ -9,7 +9,6 @@ from typing import (
     Any,
     AbstractSet,
     Mapping,
-    Dict,
 )
 
 from pydantic import BaseModel as PydanticBaseModel, Extra, ValidationError, Field
@@ -105,7 +104,7 @@ class BaseModel(PydanticBaseModel):
         exclude_unset: bool = False,
         exclude_defaults: bool = False,
         exclude_none: bool = False,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         return super(BaseModel, self).dict(
             include=include,
             exclude={*(exclude or []), *(self.AssimilatorConfig.exclude or [])},

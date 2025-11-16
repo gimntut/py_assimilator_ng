@@ -132,7 +132,7 @@ def alchemy_only(
     model,
     **_,
 ):
-    models_to_fields: Dict[Load, Any] = {}
+    models_to_fields: dict[Load, Any] = {}
     parsed_loads = list(field for field in only_fields if not isinstance(field, str))
 
     if parsed_loads:

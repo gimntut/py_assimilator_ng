@@ -1,5 +1,5 @@
-from abc import abstractstaticmethod
-from typing import Dict, Protocol, Any, Callable
+from abc import abstractmethod
+from typing import Any, Callable, Protocol
 
 
 class FilterOptionProtocol(Protocol):
@@ -13,7 +13,7 @@ class FilteringOptions:
     """Looks for the filtering option"""
 
     def __init__(self):
-        self.filter_options: Dict[str, FilterOptionProtocol] = {
+        self.filter_options: dict[str, FilterOptionProtocol] = {
             "eq": self._eq,
             "gt": self._gt,
             "gte": self._gte,
@@ -47,39 +47,48 @@ class FilteringOptions:
 
         return filter_func(foreign_field, value)
 
-    @abstractstaticmethod
+    @staticmethod
+    @abstractmethod
     def _eq(field: str, value):
         raise NotImplementedError("_eq() is not implemented in the filtering options")
 
-    @abstractstaticmethod
+    @staticmethod
+    @abstractmethod
     def _gt(field: str, value):
         raise NotImplementedError("_gt() is not implemented in the filtering options")
 
-    @abstractstaticmethod
+    @staticmethod
+    @abstractmethod
     def _gte(field: str, value):
         raise NotImplementedError("_gte() is not implemented in the filtering options")
 
-    @abstractstaticmethod
+    @staticmethod
+    @abstractmethod
     def _lt(field: str, value):
         raise NotImplementedError("_lt() is not implemented in the filtering options")
 
-    @abstractstaticmethod
+    @staticmethod
+    @abstractmethod
     def _lte(field: str, value):
         raise NotImplementedError("_lte() is not implemented in the filtering options")
 
-    @abstractstaticmethod
+    @staticmethod
+    @abstractmethod
     def _not(field: str, value):
         raise NotImplementedError("_not() is not implemented in the filtering options")
 
-    @abstractstaticmethod
+    @staticmethod
+    @abstractmethod
     def _is(field: str, value):
         raise NotImplementedError("_is() is not implemented in the filtering options")
 
-    @abstractstaticmethod
+    @staticmethod
+    @abstractmethod
     def _like(field: str, value):
         raise NotImplementedError("_like() is not implemented in the filtering options")
 
-    @abstractstaticmethod
+    @staticmethod
+    @abstractmethod
     def _regex(field: str, value):
         raise NotImplementedError("_regex() is not implemented in the filtering options")
 

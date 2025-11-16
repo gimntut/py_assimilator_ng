@@ -1,6 +1,6 @@
 import sys
 from functools import wraps
-from typing import Dict, Optional, Callable, Container
+from typing import Optional, Callable, Container
 
 
 ErrorT = Callable[[Exception], Exception] | type[Exception]
@@ -9,7 +9,7 @@ ErrorT = Callable[[Exception], Exception] | type[Exception]
 class ErrorWrapper:
     def __init__(
         self,
-        error_mappings: Optional[Dict[type[Exception], ErrorT]] = None,
+        error_mappings: Optional[dict[type[Exception], ErrorT]] = None,
         default_error: Optional[ErrorT] = None,
         skipped_errors: Optional[Container[type[Exception]]] = None,
     ):

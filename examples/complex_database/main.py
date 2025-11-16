@@ -43,14 +43,14 @@ def create_user__kwargs(uow: UnitOfWork):
 
 def create_user_model(uow: UnitOfWork):
     with uow:
-        user = User(
+        user = User(  # type: ignore
             username="Andrey-2",
             email="python.on.papyrus@gmail.com",
         )
 
         user.balances.append(
-            Balance(
-                currency=Currency(currency="USD", country="USA"),
+            Balance(  # type: ignore
+                currency=Currency(currency="USD", country="USA"),  # type: ignore
                 balance=0,
             )
         )

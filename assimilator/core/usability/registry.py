@@ -1,5 +1,4 @@
 import importlib
-from typing import Dict
 
 from pydantic import BaseModel
 
@@ -17,7 +16,7 @@ class PatternList(BaseModel):
     crud: type[CRUDService]
 
 
-registry: Dict[str, PatternList] = {}
+registry: dict[str, PatternList] = {}
 
 
 def register_provider(provider: str, pattern_list: PatternList):

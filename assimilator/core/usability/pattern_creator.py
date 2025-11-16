@@ -1,4 +1,4 @@
-from typing import TypeVar, Any, Dict
+from typing import TypeVar, Any
 
 from assimilator.core.usability.registry import get_pattern
 from assimilator.core.database import Repository, UnitOfWork
@@ -11,7 +11,7 @@ def create_repository(
     provider: str,
     model: type[ModelT],
     session: Any,
-    kwargs_repository: Dict[str, Any] = None,
+    kwargs_repository: dict[str, Any] = None,
 ) -> Repository:
     repository_cls: type[Repository] = get_pattern(provider=provider, pattern_name="repository")
     return repository_cls(model=model, session=session, **(kwargs_repository or {}))
@@ -21,8 +21,8 @@ def create_uow(
     provider: str,
     model: type[ModelT],
     session: Any,
-    kwargs_repository: Dict[str, Any] = None,
-    kwargs_uow: Dict[str, Any] = None,
+    kwargs_repository: dict[str, Any] = None,
+    kwargs_uow: dict[str, Any] = None,
 ) -> UnitOfWork:
     repository = create_repository(
         provider=provider,
@@ -38,8 +38,8 @@ def create_crud(
     provider: str,
     model: type[ModelT],
     session: Any,
-    kwargs_repository: Dict[str, Any] = None,
-    kwargs_uow: Dict[str, Any] = None,
+    kwargs_repository: dict[str, Any] = None,
+    kwargs_uow: dict[str, Any] = None,
 ) -> CRUDService:
     uow = create_uow(
         provider=provider,

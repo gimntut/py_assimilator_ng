@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from functools import wraps
-from typing import Any, Callable, Collection, Dict, Generic, Iterable, Optional, Tuple, TypeVar, final
+from typing import Any, Callable, Collection, Generic, Iterable, Optional, Tuple, TypeVar, final
 
 from assimilator.core.database.specifications.specifications import SpecificationList, SpecificationType
 from assimilator.core.patterns.error_wrapper import ErrorWrapper
@@ -44,13 +44,13 @@ class Repository(Generic[SessionT, ModelT, QueryT, SpecsT], ABC):
 
         self.error_wrapper = error_wrapper or ErrorWrapper()
         self.get = LazyCommand.decorate(self.error_wrapper.decorate(self.get))
-        self.filter: Repository.filter = LazyCommand.decorate(self.error_wrapper.decorate(self.filter))
-        self.save: Repository.save = self.error_wrapper.decorate(self.save)
-        self.delete: Repository.delete = self.error_wrapper.decorate(self.delete)
-        self.update: Repository.update = self.error_wrapper.decorate(self.update)
-        self.is_modified: Repository.is_modified = self.error_wrapper.decorate(self.is_modified)
-        self.refresh: Repository.refresh = self.error_wrapper.decorate(self.refresh)
-        self.count: Repository.count = LazyCommand.decorate(self.error_wrapper.decorate(self.count))
+        self.filter = LazyCommand.decorate(self.error_wrapper.decorate(self.filter))
+        self.save = self.error_wrapper.decorate(self.save)
+        self.delete = self.error_wrapper.decorate(self.delete)
+        self.update = self.error_wrapper.decorate(self.update)
+        self.is_modified = self.error_wrapper.decorate(self.is_modified)
+        self.refresh = self.error_wrapper.decorate(self.refresh)
+        self.count = LazyCommand.decorate(self.error_wrapper.decorate(self.count))
 
     @final
     def _check_obj_is_specification(
@@ -79,7 +79,7 @@ class Repository(Generic[SessionT, ModelT, QueryT, SpecsT], ABC):
         else:
             raise NotImplementedError("You must either pass the initial query or define get_initial_query()")
 
-    def _get_specifications_context(self) -> Dict[str, Any]:
+    def _get_specifications_context(self) -> dict[str, Any]:
         return {"model": self.model, "repository": self}
 
     @abstractmethod
