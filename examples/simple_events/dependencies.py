@@ -34,8 +34,3 @@ elif sys.argv[1] == "redis":
 
     get_producer = get_redis_producer
     get_consumer = get_redis_consumer
-
-elif sys.argv[1] == "redis":
-    User = RedisUser
-    get_uow = get_redis_uow
-    redis_session.flushdb()
