@@ -74,9 +74,9 @@ class MongoRepository(Repository):
         data = list(self._collection.find(**query))
 
         if not data:
-            raise NotFoundError(f"{self} repository get() did not find " f"any entities with {query} filter")
+            raise NotFoundError(f"{self} repository get() did not find any entities with {query} filter")
         elif len(data) != 1:
-            raise MultipleResultsError(f"{self} repository get() returned" f" multiple results with {query} query")
+            raise MultipleResultsError(f"{self} repository get() returned multiple results with {query} query")
 
         return self.model(**data[0])
 

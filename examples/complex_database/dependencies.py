@@ -10,17 +10,25 @@ from assimilator.redis_.database import RedisRepository, RedisUnitOfWork
 from assimilator.mongo.database import MongoRepository, MongoUnitOfWork
 
 from examples.complex_database.models import (
-    engine, AlchemyUser, AlchemyUserBalance, AlchemyBalanceCurrency,
-    InternalUser, InternalBalance, InternalCurrency,
-    RedisUser, RedisBalance, RedisCurrency,
-    MongoUser, MongoCurrency, MongoBalance,
+    engine,
+    AlchemyUser,
+    AlchemyUserBalance,
+    AlchemyBalanceCurrency,
+    InternalUser,
+    InternalBalance,
+    InternalCurrency,
+    RedisUser,
+    RedisBalance,
+    RedisCurrency,
+    MongoUser,
+    MongoCurrency,
+    MongoBalance,
 )
 
 if len(sys.argv) == 1 or sys.argv[1] == "alchemy":
     User = AlchemyUser
     Balance = AlchemyUserBalance
     Currency = AlchemyBalanceCurrency
-
 
     def get_uow():
         DatabaseSession = sessionmaker(bind=engine)
@@ -46,11 +54,9 @@ elif sys.argv[1] == "redis":
     Balance = RedisBalance
     Currency = RedisCurrency
 
-
     def get_uow():
         repository = RedisRepository(redis_session, model=User)
         return RedisUnitOfWork(repository)
-
 
     redis_session.flushdb()
 
@@ -60,9 +66,8 @@ elif sys.argv[1] == "mongo":
     Currency = MongoCurrency
     mongo_client = pymongo.MongoClient()
 
-    mongo_client['assimilator_complex'].drop_collection(MongoUser.AssimilatorConfig.collection)
-
+    mongo_client["assimilator_complex"].drop_collection(MongoUser.AssimilatorConfig.collection)
 
     def get_uow():
-        repository = MongoRepository(session=mongo_client, model=User, database='assimilator_complex')
+        repository = MongoRepository(session=mongo_client, model=User, database="assimilator_complex")
         return MongoUnitOfWork(repository)

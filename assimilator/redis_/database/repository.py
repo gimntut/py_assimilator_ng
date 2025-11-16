@@ -68,9 +68,10 @@ class RedisRepository(Repository):
         )
 
         if not parsed_objects:
-            raise NotFoundError(f"{self} repository get() did not find " f"any results with this query: {query}")
+            raise NotFoundError(f"{self} repository get() did not find any results with this query: {query}")
         elif len(parsed_objects) != 1:
-            raise MultipleResultsError(f"{self} repository get() did not" f" find any results with this query: {query}")
+            print(*parsed_objects, sep="\n\t *** ")
+            raise MultipleResultsError(f"{self} repository get() did not find any results with this query: {query}")
 
         return parsed_objects[0]
 

@@ -26,16 +26,14 @@ class AlchemyUser(Base):
 
 class AlchemyUserBalance(Base):
     __tablename__ = "balances"
-    __table_args__ = (
-        UniqueConstraint("balance", "user_id"),
-    )
+    __table_args__ = (UniqueConstraint("balance", "user_id"),)
 
     id = Column(Integer(), primary_key=True)
 
     user_id = Column(ForeignKey("users.id", ondelete="CASCADE"))
     user = relationship("AlchemyUser", back_populates="balances")
 
-    balance = Column(Float(), server_default='0')
+    balance = Column(Float(), server_default="0")
 
     currency_id = Column(ForeignKey("currency.id"))
     currency = relationship("AlchemyBalanceCurrency", uselist=False)
@@ -154,7 +152,7 @@ class MongoUser(MongoModel):
         collection: str = "users"
 
     balances: List[MongoBalance] = []
-    username: Optional[str]     # For only specification
+    username: Optional[str]  # For only specification
     email: Optional[str]
 
     def __str__(self):
