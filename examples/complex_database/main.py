@@ -1,4 +1,3 @@
-from complex_database.dependencies import BaseUser
 from dependencies import Balance, Currency, User, get_uow
 from pymongo.cursor import Sequence
 
@@ -9,6 +8,7 @@ from assimilator.core.patterns import LazyCommand
 from assimilator.internal.database import InternalRepository, eq
 from assimilator.mongo.database.repository import MongoRepository
 from assimilator.redis_.database import RedisRepository
+from examples.complex_database.dependencies import BaseUser
 
 
 def create_user__kwargs(uow: UnitOfWork):
@@ -235,13 +235,13 @@ if __name__ == "__main__":
     create_user__kwargs(get_uow())
     create_user_model(get_uow())
 
-    read_user(username="Andrey", blnc=2000, repository=get_uow().repository)
+    read_user(username="Andrey", balance=2000, repository=get_uow().repository)
     read_user_direct(username="Andrey-2", repository=get_uow().repository)
 
     update_user(get_uow())
-    read_user(username="Andrey", blnc=3000, repository=get_uow().repository)
+    read_user(username="Andrey", balance=3000, repository=get_uow().repository)
 
-    second_user = read_user(username="Andrey-2", blnc=0, repository=get_uow().repository)
+    second_user = read_user(username="Andrey-2", balance=0, repository=get_uow().repository)
     update_user_direct(user=second_user, uow=get_uow())
 
     create_many_users(get_uow())
