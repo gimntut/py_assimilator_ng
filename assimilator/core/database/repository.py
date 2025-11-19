@@ -54,7 +54,7 @@ class Repository(Generic[SessionT, ModelT, QueryT, SpecsT], ABC):
 
     @final
     def _check_obj_is_specification(
-        self, obj: ModelT, specifications: Iterable[SpecificationType]
+        self, obj: ModelT | None, specifications: Iterable[SpecificationType]
     ) -> Tuple[ModelT | None, Iterable[SpecificationType]]:
         """
         This function is called for parts of the code that use both obj and *specifications.

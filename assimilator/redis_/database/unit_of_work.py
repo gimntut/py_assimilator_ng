@@ -1,9 +1,9 @@
 from typing import Optional
 
-from assimilator.core.patterns import ErrorWrapper
 from assimilator.core.database.unit_of_work import UnitOfWork
-from assimilator.redis_.database.repository import RedisRepository
+from assimilator.core.patterns import ErrorWrapper
 from assimilator.internal.database.error_wrapper import InternalErrorWrapper
+from assimilator.redis_.database.repository import RedisRepository
 
 
 class RedisUnitOfWork(UnitOfWork):
@@ -25,10 +25,10 @@ class RedisUnitOfWork(UnitOfWork):
         self.repository.transaction = self.repository.session.pipeline()
 
     def rollback(self):
-        self.repository.transaction.discard()
+        self.repository.transaction.discard()  # type:ignore
 
     def commit(self):
-        self.repository.transaction.execute()
+        self.repository.transaction.execute()  # type:ignore
 
     def close(self):
         self.repository.transaction.reset()

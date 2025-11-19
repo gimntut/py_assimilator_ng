@@ -1,22 +1,13 @@
 import json
-from typing import Optional, TypeVar, List
+from collections.abc import Iterable, Sized
+from typing import List, Optional, TypeVar, cast
 
 from redis import Redis
 from redis.client import Pipeline
+from redis.typing import KeyT
 
-from assimilator.core.database import (
-    BaseModel,
-    LazyCommand,
-    Repository,
-    SpecificationList,
-    SpecificationType,
-)
-from assimilator.core.database.exceptions import (
-    DataLayerError,
-    InvalidQueryError,
-    MultipleResultsError,
-    NotFoundError,
-)
+from assimilator.core.database import BaseModel, LazyCommand, Repository, SpecificationType
+from assimilator.core.database.exceptions import DataLayerError, InvalidQueryError, MultipleResultsError, NotFoundError
 from assimilator.core.patterns.error_wrapper import ErrorWrapper
 from assimilator.internal.database import InternalSpecificationList
 from assimilator.internal.database.models_utils import dict_to_internal_models
@@ -24,7 +15,7 @@ from assimilator.internal.database.models_utils import dict_to_internal_models
 RedisModelT = TypeVar("RedisModelT", bound=BaseModel)
 
 
-class RedisRepository(Repository):
+class RedisRepository(Repository[Redis, RedisModelT, str, InternalSpecificationList]):
     session: Redis
     transaction: Pipeline | Redis
 
@@ -33,7 +24,7 @@ class RedisRepository(Repository):
         session: Redis,
         model: type[RedisModelT],
         initial_query: Optional[str] = "",
-        specifications: type[SpecificationList] = InternalSpecificationList,
+        specifications=InternalSpecificationList,
         error_wrapper: Optional[ErrorWrapper] = None,
         use_double_filter: bool = True,
     ):
@@ -47,6 +38,7 @@ class RedisRepository(Repository):
         self.transaction = session
         self.use_double_specifications = use_double_filter
 
+    # type: ignore
     def get(
         self,
         *specifications: SpecificationType,
@@ -54,14 +46,15 @@ class RedisRepository(Repository):
         initial_query: Optional[str] = None,
     ) -> LazyCommand[RedisModelT] | RedisModelT:
         query = self._apply_specifications(query=initial_query, specifications=specifications) or "*"
-        found_objects = self.session.mget(self.session.keys(query))
+        keys = cast(KeyT, self.session.keys(query))
+        found_objects = cast(Iterable, self.session.mget(keys))
 
         if not all(found_objects):
             raise NotFoundError(f"{self} repository get() did not find any results with this query: {query}")
 
         parsed_objects = list(
             self._apply_specifications(
-                query=[self.model.loads(found_object) for found_object in found_objects],
+                query=[self.model.loads(found_object) for found_object in found_objects],  # type: ignore
                 specifications=specifications,
             )
         )
@@ -71,8 +64,7 @@ class RedisRepository(Repository):
         elif len(parsed_objects) != 1:
             print(*parsed_objects, sep="\n\t *** ")
             raise MultipleResultsError(f"{self} repository get() did not find any results with this query: {query}")
-
-        return parsed_objects[0]
+        return cast(RedisModelT, parsed_objects[0])
 
     def filter(
         self,
@@ -90,15 +82,15 @@ class RedisRepository(Repository):
             )
         else:
             key_name = "*"
-
-        models = self.session.mget(self.session.keys(key_name))
+        keys = cast(KeyT, self.session.keys(key_name))
+        models = cast(Iterable, self.session.mget(keys))
 
         if isinstance(self.model, BaseModel):
             query = [self.model.loads(value) for value in models]
         else:
             query = [self.model(**json.loads(value)) for value in models]
 
-        return list(self._apply_specifications(specifications=specifications, query=query))
+        return cast(list[RedisModelT], list(self._apply_specifications(specifications=specifications, query=query)))  # type: ignore
 
     def dict_to_models(self, data: dict) -> RedisModelT:
         return self.model(**dict_to_internal_models(data=data, model=self.model))
@@ -119,10 +111,11 @@ class RedisRepository(Repository):
         return obj
 
     def delete(self, obj: Optional[RedisModelT] = None, *specifications: SpecificationType) -> None:
-        obj, specifications = self._check_obj_is_specification(obj, specifications)
+        obj, clear_specifications = self._check_obj_is_specification(obj, specifications)
 
-        if specifications:
-            self.transaction.delete(*[str(model.id) for model in self.filter(*specifications)])
+        if clear_specifications:
+            models = cast(list[RedisModelT], self.filter(*clear_specifications))
+            self.transaction.delete(*[str(model.id) for model in models])
         elif obj is not None:
             self.transaction.delete(obj.id)
 
@@ -132,15 +125,15 @@ class RedisRepository(Repository):
         *specifications: SpecificationType,
         **update_values,
     ) -> None:
-        obj, specifications = self._check_obj_is_specification(obj, specifications)
+        obj, clear_specifications = self._check_obj_is_specification(obj, specifications)
 
-        if specifications:
+        if clear_specifications:
             if not update_values:
                 raise InvalidQueryError(
                     "You did not provide any update_values to the update() yet provided specifications"
                 )
 
-            models = self.filter(*specifications, lazy=False)
+            models = cast(list[RedisModelT], self.filter(*clear_specifications, lazy=False))
             updated_models = {}
 
             for model in models:
@@ -153,10 +146,14 @@ class RedisRepository(Repository):
             obj.only_update = True
             self.save(obj)
 
-    def is_modified(self, obj: RedisModelT) -> None:
+    def is_modified(self, obj: RedisModelT) -> bool | None:
+        if self.specifications is None:
+            return False
         return self.get(self.specifications.filter(obj.id), lazy=False) == obj
 
     def refresh(self, obj: RedisModelT) -> None:
+        if self.specifications is None:
+            return
         fresh_obj = self.get(self.specifications.filter(obj.id), lazy=False)
 
         for key, value in fresh_obj.dict().items():
@@ -169,13 +166,14 @@ class RedisRepository(Repository):
         initial_query: Optional[str] = None,
     ) -> LazyCommand[int] | int:
         if not specifications:
-            return self.session.dbsize()
+            return cast(int, self.session.dbsize())
 
         filter_query = self._apply_specifications(
             query=initial_query,
             specifications=specifications,
         )
-        return len(self.session.keys(filter_query))
+        keys = cast(Sized, self.session.keys(filter_query))
+        return len(keys)
 
 
 __all__ = [

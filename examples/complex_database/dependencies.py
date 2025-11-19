@@ -1,7 +1,6 @@
 import sys
 
 import pymongo
-from examples.complex_database.interfaces import IBalance, ICurrency, IUnitOfWork, IUser
 from redis.client import Redis
 from sqlalchemy.orm import sessionmaker
 
@@ -9,6 +8,7 @@ from assimilator.alchemy.database import AlchemyRepository, AlchemyUnitOfWork
 from assimilator.internal.database import InternalRepository, InternalUnitOfWork
 from assimilator.mongo.database import MongoRepository, MongoUnitOfWork
 from assimilator.redis_.database import RedisRepository, RedisUnitOfWork
+from examples.complex_database.interfaces import IBalance, ICurrency, IUnitOfWork, IUser
 from examples.complex_database.models import (
     AlchemyBalanceCurrency,
     AlchemyUser,
