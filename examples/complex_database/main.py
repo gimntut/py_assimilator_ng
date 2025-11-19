@@ -1,17 +1,17 @@
+from examples.complex_database.interfaces import IUnitOfWork, IUser
 from dependencies import Balance, Currency, User, get_uow
 from pymongo.cursor import Sequence
 
 from assimilator.alchemy.database import AlchemyRepository
-from assimilator.core.database import Repository, UnitOfWork
+from assimilator.core.database import Repository
 from assimilator.core.database.specifications.adaptive import filter_, join, only, order
 from assimilator.core.patterns import LazyCommand
 from assimilator.internal.database import InternalRepository, eq
 from assimilator.mongo.database.repository import MongoRepository
 from assimilator.redis_.database import RedisRepository
-from examples.complex_database.dependencies import BaseUser
 
 
-def create_user__kwargs(uow: UnitOfWork):
+def create_user__kwargs(uow: IUnitOfWork):
     with uow:
         uow.repository.save(
             username="Andrey",
@@ -43,7 +43,7 @@ def create_user__kwargs(uow: UnitOfWork):
         uow.commit()
 
 
-def create_user_model(uow: UnitOfWork):
+def create_user_model(uow: IUnitOfWork):
     with uow:
         user = User(  # type: ignore
             username="Andrey-2",
@@ -61,7 +61,7 @@ def create_user_model(uow: UnitOfWork):
 
 
 def read_user(username: str, balance: int, repository: Repository):
-    user: BaseUser = repository.get(  # type: ignore
+    user: IUser = repository.get(  # type: ignore
         join("balances", "balances.currency"),
         filter_(
             username__eq=username,
@@ -80,14 +80,14 @@ def read_user(username: str, balance: int, repository: Repository):
 
 
 def read_user_direct(username: str, repository: Repository):
-    user: BaseUser
+    # user: IUser
     if isinstance(repository, AlchemyRepository):  # Awful! Try to use filtering options
-        user = repository.get(  # type: ignore
+        user = repository.get(
             repository.specs.join("balances"),
             repository.specs.filter(User.username == username),
         )
     elif isinstance(repository, (InternalRepository, RedisRepository)):
-        user = repository.get(  # type: ignore
+        user = repository.get(
             repository.specs.filter(
                 eq("username", username),
                 # will call model.username == username for every model
@@ -106,7 +106,7 @@ def read_user_direct(username: str, repository: Repository):
     return user
 
 
-def update_user(uow: UnitOfWork):
+def update_user(uow: IUnitOfWork):
     with uow:
         user = uow.repository.get(
             uow.repository.specs.filter(
@@ -120,14 +120,14 @@ def update_user(uow: UnitOfWork):
         uow.commit()
 
 
-def update_user_direct(user, uow: UnitOfWork):
+def update_user_direct(user, uow: IUnitOfWork):
     with uow:
         user.balances[0].balance /= 2
         uow.repository.update(user)
         uow.commit()
 
 
-def create_many_users(uow: UnitOfWork):
+def create_many_users(uow: IUnitOfWork):
     with uow:
         for i in range(100):
             uow.repository.save(
@@ -147,7 +147,7 @@ def create_many_users(uow: UnitOfWork):
         uow.commit()
 
 
-def create_many_users_direct(uow: UnitOfWork):
+def create_many_users_direct(uow: IUnitOfWork):
     with uow:
         for i in range(100):
             uow.repository.save(
@@ -167,7 +167,7 @@ def create_many_users_direct(uow: UnitOfWork):
 
 
 def filter_users(repository: Repository):
-    users: Sequence[BaseUser] = repository.filter(  # type: ignore
+    users: Sequence[IUser] = repository.filter(  # type: ignore
         join("balances"),
         order("balances.balance"),
         filter_(balances__balance__gt=50),
@@ -192,7 +192,7 @@ def count_users(repository: Repository):
 
 
 def filter_users_lazy(repository: Repository):
-    users: LazyCommand[BaseUser] = repository.filter(  # type: ignore
+    users: LazyCommand[IUser] = repository.filter(  # type: ignore
         repository.specs.join("balances"),
         repository.specs.filter(balances__balance__eq=0),
         lazy=True,
@@ -202,7 +202,7 @@ def filter_users_lazy(repository: Repository):
         print("User without any money:", user.username, user.balances)
 
 
-def update_many_users(uow: UnitOfWork):
+def update_many_users(uow: IUnitOfWork):
     username_filter = uow.repository.specs.filter(username__like="User-%")
 
     with uow:
@@ -218,7 +218,7 @@ def update_many_users(uow: UnitOfWork):
         assert all(balance.balance == 10 for balance in user.balances)
 
 
-def delete_many_users(uow: UnitOfWork):
+def delete_many_users(uow: IUnitOfWork):
     with uow:
         uow.repository.delete(
             uow.repository.specs.filter(

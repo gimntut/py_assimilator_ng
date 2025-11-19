@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from functools import wraps
-from typing import Any, Callable, Collection, Generic, Iterable, Optional, Tuple, TypeVar, final
+from typing import Any, Callable, Collection, Generic, Iterable, Optional, Tuple, TypeVar, cast, final
 
 from assimilator.core.database.specifications.specifications import SpecificationList, SpecificationType
 from assimilator.core.patterns.error_wrapper import ErrorWrapper
@@ -25,7 +25,7 @@ def make_lazy(func: Callable):
 QueryT = TypeVar("QueryT")
 ModelT = TypeVar("ModelT")
 SessionT = TypeVar("SessionT")
-SpecsT = TypeVar("SpecsT", bound=type[SpecificationList])
+SpecsT = TypeVar("SpecsT", bound=SpecificationList)
 
 
 class Repository(Generic[SessionT, ModelT, QueryT, SpecsT], ABC):
@@ -33,14 +33,14 @@ class Repository(Generic[SessionT, ModelT, QueryT, SpecsT], ABC):
         self,
         session: SessionT,
         model: type[ModelT],
-        specifications: SpecsT,
+        specifications: type[SpecsT],
         initial_query: Optional[QueryT] = None,
         error_wrapper: Optional[ErrorWrapper] = None,
     ):
         self.session = session
         self.model = model
-        self.__initial_query: QueryT = initial_query
-        self.specifications: SpecsT = specifications
+        self.__initial_query: QueryT | None = initial_query
+        self.specifications: type[SpecsT] | None = specifications
 
         self.error_wrapper = error_wrapper or ErrorWrapper()
         self.get = LazyCommand.decorate(self.error_wrapper.decorate(self.get))
@@ -55,19 +55,20 @@ class Repository(Generic[SessionT, ModelT, QueryT, SpecsT], ABC):
     @final
     def _check_obj_is_specification(
         self, obj: ModelT, specifications: Iterable[SpecificationType]
-    ) -> Tuple[Optional[ModelT], Iterable[SpecificationType]]:
+    ) -> Tuple[ModelT | None, Iterable[SpecificationType]]:
         """
         This function is called for parts of the code that use both obj and *specifications.
         We check that if the obj is a model
         """
 
         if not isinstance(obj, self.model) and (obj is not None):
-            return None, (obj, *specifications)  # obj is specification
+            spec = cast(SpecificationType, obj)
+            return None, (spec, *specifications)  # obj is specification
 
         return obj, specifications
 
     @property
-    def specs(self) -> SpecsT:
+    def specs(self) -> type[SpecsT] | None:
         """That property is used to shorten the full name of the self.specifications."""
         return self.specifications
 

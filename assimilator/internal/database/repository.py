@@ -17,10 +17,7 @@ from assimilator.internal.database.models_utils import dict_to_internal_models
 ModelT = TypeVar("ModelT", bound=BaseModel)
 
 
-class InternalRepository(Repository):
-    session: dict
-    model: type[ModelT]
-
+class InternalRepository(Repository[dict, ModelT, str, InternalSpecificationList]):
     def __init__(
         self,
         session: dict,
