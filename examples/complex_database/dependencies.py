@@ -5,10 +5,11 @@ from redis.client import Redis
 from sqlalchemy.orm import sessionmaker
 
 from assimilator.alchemy.database import AlchemyRepository, AlchemyUnitOfWork
+from assimilator.core.database.unit_of_work import UnitOfWork
 from assimilator.internal.database import InternalRepository, InternalUnitOfWork
 from assimilator.mongo.database import MongoRepository, MongoUnitOfWork
 from assimilator.redis_.database import RedisRepository, RedisUnitOfWork
-from examples.complex_database.interfaces import IBalance, ICurrency, IUnitOfWork, IUser
+from examples.complex_database.interfaces import IBalance, ICurrency, IUser
 from examples.complex_database.models import (
     AlchemyBalanceCurrency,
     AlchemyUser,
@@ -34,7 +35,7 @@ if len(sys.argv) == 1 or sys.argv[1] == "alchemy":
     Balance = AlchemyUserBalance
     Currency = AlchemyBalanceCurrency
 
-    def get_uow() -> IUnitOfWork:  # pyright: ignore[reportRedeclaration]
+    def get_uow() -> UnitOfWork:  # pyright: ignore[reportRedeclaration]
         DatabaseSession = sessionmaker(bind=engine)
         repository = AlchemyRepository(
             session=DatabaseSession(),
@@ -48,7 +49,7 @@ elif sys.argv[1] == "internal":
     Currency = InternalCurrency
     internal_session = {}
 
-    def get_uow() -> IUnitOfWork:  # pyright: ignore[reportRedeclaration]
+    def get_uow() -> UnitOfWork:  # pyright: ignore[reportRedeclaration]
         repository = InternalRepository(internal_session, model=InternalUser)
         return InternalUnitOfWork(repository)
 
@@ -58,7 +59,7 @@ elif sys.argv[1] == "redis":
     Balance = RedisBalance
     Currency = RedisCurrency
 
-    def get_uow() -> IUnitOfWork:  # pyright: ignore[reportRedeclaration]
+    def get_uow() -> UnitOfWork:  # pyright: ignore[reportRedeclaration]
         repository = RedisRepository(redis_session, model=User)
         return RedisUnitOfWork(repository)
 
@@ -72,6 +73,6 @@ elif sys.argv[1] == "mongo":
 
     mongo_client["assimilator_complex"].drop_collection(MongoUser.AssimilatorConfig.collection)
 
-    def get_uow() -> IUnitOfWork:
+    def get_uow() -> UnitOfWork:
         repository = MongoRepository(session=mongo_client, model=User, database="assimilator_complex")
         return MongoUnitOfWork(repository)
