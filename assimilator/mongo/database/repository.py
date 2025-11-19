@@ -1,24 +1,24 @@
-from typing import Optional, Collection, TypeVar
+from typing import Collection, Optional, TypeVar
 
 from pymongo import MongoClient
 
-from assimilator.mongo.database.models import MongoModel
-from assimilator.core.patterns import LazyCommand, ErrorWrapper
-from assimilator.mongo.database.error_wrapper import MongoErrorWrapper
 from assimilator.core.database import (
-    Repository,
-    SpecificationType,
-    SpecificationList,
-    NotFoundError,
     MultipleResultsError,
+    NotFoundError,
+    Repository,
+    SpecificationList,
+    SpecificationType,
 )
-from assimilator.mongo.database.specifications.specifications import MongoSpecificationList
+from assimilator.core.patterns import ErrorWrapper, LazyCommand
 from assimilator.internal.database.models_utils import dict_to_internal_models
+from assimilator.mongo.database.error_wrapper import MongoErrorWrapper
+from assimilator.mongo.database.models import MongoModel
+from assimilator.mongo.database.specifications.specifications import MongoSpecificationList
 
 ModelT = TypeVar("ModelT", bound=MongoModel)
 
 
-class MongoRepository(Repository):
+class MongoRepository(Repository[MongoClient, MongoModel, dict, MongoSpecificationList]):
     id: str = "_id"
     session: MongoClient
     model: type[MongoModel]

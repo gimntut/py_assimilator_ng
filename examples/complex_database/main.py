@@ -1,5 +1,4 @@
-from examples.complex_database.interfaces import IUnitOfWork, IUser
-from dependencies import Balance, Currency, User, get_uow
+from examples.complex_database.dependencies import Balance, Currency, User, get_uow
 from pymongo.cursor import Sequence
 
 from assimilator.alchemy.database import AlchemyRepository
@@ -9,6 +8,7 @@ from assimilator.core.patterns import LazyCommand
 from assimilator.internal.database import InternalRepository, eq
 from assimilator.mongo.database.repository import MongoRepository
 from assimilator.redis_.database import RedisRepository
+from examples.complex_database.interfaces import IUnitOfWork, IUser
 
 
 def create_user__kwargs(uow: IUnitOfWork):
@@ -61,6 +61,8 @@ def create_user_model(uow: IUnitOfWork):
 
 
 def read_user(username: str, balance: int, repository: Repository):
+    if repository.specs is None:
+        return None
     user: IUser = repository.get(  # type: ignore
         join("balances", "balances.currency"),
         filter_(
@@ -80,7 +82,8 @@ def read_user(username: str, balance: int, repository: Repository):
 
 
 def read_user_direct(username: str, repository: Repository):
-    # user: IUser
+    if repository.specs is None:
+        return None
     if isinstance(repository, AlchemyRepository):  # Awful! Try to use filtering options
         user = repository.get(
             repository.specs.join("balances"),
@@ -155,8 +158,8 @@ def create_many_users_direct(uow: IUnitOfWork):
                     username=f"User-{i}",
                     email=f"user-{i}@py_assimilator.com",
                     balances=[
-                        Balance(
-                            currency=Currency(currency="EUR", country="EU"),
+                        Balance(  # type: ignore
+                            currency=Currency(currency="EUR", country="EU"),  # type: ignore
                             balance=i * 10,
                         ),
                     ],
@@ -179,6 +182,8 @@ def filter_users(repository: Repository):
 
 def count_users(repository: Repository):
     print("Total users:", repository.count())
+    if repository.specs is None:
+        return
     print(
         "Users with balances greater than 5000:",
         repository.count(
@@ -192,6 +197,8 @@ def count_users(repository: Repository):
 
 
 def filter_users_lazy(repository: Repository):
+    if repository.specs is None:
+        return
     users: LazyCommand[IUser] = repository.filter(  # type: ignore
         repository.specs.join("balances"),
         repository.specs.filter(balances__balance__eq=0),
@@ -203,6 +210,8 @@ def filter_users_lazy(repository: Repository):
 
 
 def update_many_users(uow: IUnitOfWork):
+    if uow.repository.specs is None:
+        return
     username_filter = uow.repository.specs.filter(username__like="User-%")
 
     with uow:
