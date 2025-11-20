@@ -30,3 +30,8 @@ test:
 	storage=mongo $(run) examples/fastapi_crud_example/main.py
 
 	docker stop ass-redis ass-mongodb
+
+.PHONY: lint
+lint:
+	uv run ruff check --fix
+	uv run ruff format

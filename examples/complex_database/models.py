@@ -1,14 +1,17 @@
 from typing import List, Optional
 
 from sqlalchemy import create_engine, Column, String, Float, Integer, ForeignKey, UniqueConstraint
-from sqlalchemy.orm import declarative_base, relationship
+from sqlalchemy.orm import DeclarativeBase, relationship
 
 from assimilator.core.database import BaseModel
 from assimilator.mongo.database import MongoModel
 from assimilator.redis_.database import RedisModel
 
 engine = create_engine(url="sqlite:///:memory:")
-Base = declarative_base()
+
+
+class Base(DeclarativeBase):
+    pass
 
 
 class AlchemyUser(Base):
