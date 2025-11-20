@@ -1,5 +1,5 @@
 from functools import wraps
-from typing import Union, Callable, Iterable, TypeVar, Generic, Iterator
+from typing import Callable, Generic, Iterable, Iterator, TypeVar
 
 T = TypeVar("T")
 
@@ -9,9 +9,9 @@ class LazyCommand(Generic[T]):
         self.command = command
         self.args = args
         self.kwargs = kwargs
-        self._results: T = None
+        self._results: T | None = None
 
-    def __call__(self) -> Union[T]:
+    def __call__(self) -> T:
         if self._results is not None:
             return self._results
 
@@ -47,9 +47,8 @@ class LazyCommand(Generic[T]):
 
     @staticmethod
     def decorate(func: Callable) -> Callable:
-
         @wraps(func)
-        def lazy_wrapper(*args, lazy: bool = False, **kwargs) -> Union[LazyCommand[T], T]:
+        def lazy_wrapper(*args, lazy: bool = False, **kwargs) -> LazyCommand[T] | T:
             if lazy:
                 return LazyCommand(
                     func,
@@ -64,4 +63,4 @@ class LazyCommand(Generic[T]):
         return lazy_wrapper
 
 
-__all__ = ['LazyCommand']
+__all__ = ["LazyCommand"]

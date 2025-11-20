@@ -8,5 +8,5 @@ pattern_list = PatternList(
     crud=CRUDService,
 )
 
-register_provider(provider='redis', pattern_list=pattern_list)
-register_provider(provider='redis_', pattern_list=pattern_list)
+register_provider(provider="redis", pattern_list=pattern_list)
+register_provider(provider="redis_", pattern_list=pattern_list)

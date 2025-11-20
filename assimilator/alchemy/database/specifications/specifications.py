@@ -1,16 +1,16 @@
 from itertools import zip_longest
-from typing import Collection, Optional, Iterable, Any, Dict, Callable, Union
+from typing import Any, Callable, Collection, Iterable, Optional, Union
 
-from sqlalchemy.orm import load_only, Load
-from sqlalchemy import column, desc, and_, or_, not_, Select, inspect
+from sqlalchemy import Select, and_, column, desc, inspect, not_, or_
+from sqlalchemy.orm import Load, load_only
 
 from assimilator.alchemy.database.model_utils import get_model_from_relationship
 from assimilator.alchemy.database.specifications.filtering_options import AlchemyFilteringOptions
 from assimilator.core.database.specifications.specifications import (
-    specification,
+    FilterSpecification,
     SpecificationList,
     SpecificationType,
-    FilterSpecification,
+    specification,
 )
 
 
@@ -21,40 +21,42 @@ class AlchemyFilter(FilterSpecification):
         super(AlchemyFilter, self).__init__(*filters)
         self.filters.append(named_filters)
 
-    def __or__(self, other: 'FilterSpecification') -> SpecificationType:
+    def __or__(self, other: "FilterSpecification") -> SpecificationType:
         return CompositeFilter(self, other, func=or_)
 
-    def __and__(self, other: 'FilterSpecification') -> SpecificationType:
+    def __and__(self, other: "FilterSpecification") -> SpecificationType:
         return CompositeFilter(self, other, func=and_)
 
     def __invert__(self):
         return CompositeFilter(self, func=not_)
 
     def parse_filters(self, model):
+        assert isinstance(self.filtering_options, AlchemyFilteringOptions)
         self.filtering_options.table_name = str(inspect(model).selectable)
-        named_filters = list(filter_ for filter_ in self.filters if isinstance(filter_, Dict))
+        named_filters = list(filter_ for filter_ in self.filters if isinstance(filter_, dict))
 
         for filter_ in named_filters:
             for field, value in filter_.items():
                 self.filters.append(
                     self.filtering_options.parse_field(
-                        raw_field=field, value=value,
+                        raw_field=field,
+                        value=value,
                     )
                 )
 
             self.filters.remove(filter_)
 
     def __call__(self, query: Select, **context: Any) -> Select:
-        self.parse_filters(context['repository'].model)
+        self.parse_filters(context["repository"].model)
         return query.filter(*self.filters)
 
 
 class CompositeFilter(AlchemyFilter):
-    def __init__(self, *filters: Union[FilterSpecification, 'CompositeFilter'], func: Callable):
+    def __init__(self, *filters: Union[FilterSpecification, "CompositeFilter"], func: Callable):
         super(CompositeFilter, self).__init__()
         self.filter_specs = filters
         self.func = func
-    
+
     def __call__(self, query: Select, **context: Any) -> Select:
         parsed_specs = []
 
@@ -99,11 +101,11 @@ def alchemy_paginate(
 @specification
 def alchemy_join(
     *targets: Collection,
-    join_args: Iterable[dict] = None,
+    join_args: Iterable[dict] | None = None,
     query: Select,
     **context,
 ) -> Select:
-    model = context['repository'].model
+    model = context["repository"].model
 
     for target, join_data in zip_longest(targets, (join_args or {}), fillvalue=dict()):
         if not target:
@@ -119,8 +121,7 @@ def alchemy_join(
                     relationship_name=entity,
                 )
 
-        query = query.join_from(model, target, **join_data)\
-            .add_columns(target).select_from(model)
+        query = query.join_from(model, target, **join_data).add_columns(target).select_from(model)
 
     return query
 
@@ -132,14 +133,14 @@ def alchemy_only(
     model,
     **_,
 ):
-    models_to_fields: Dict[Load, Any] = {}
+    models_to_fields: dict[Load, Any] = {}
     parsed_loads = list(field for field in only_fields if not isinstance(field, str))
 
     if parsed_loads:
         query = query.options(load_only(*parsed_loads))
 
     for field in (field for field in only_fields if isinstance(field, str)):
-        parts = field.split('.')
+        parts = field.split(".")
         if len(parts) == 1:
             models_to_fields[Load(model)] = [
                 getattr(model, field),
@@ -181,11 +182,11 @@ class AlchemySpecificationList(SpecificationList):
 
 
 __all__ = [
-    'AlchemySpecificationList',
-    'alchemy_filter',
-    'AlchemyFilter',
-    'alchemy_order',
-    'alchemy_paginate',
-    'alchemy_join',
-    'alchemy_only',
+    "AlchemySpecificationList",
+    "alchemy_filter",
+    "AlchemyFilter",
+    "alchemy_order",
+    "alchemy_paginate",
+    "alchemy_join",
+    "alchemy_only",
 ]

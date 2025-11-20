@@ -40,5 +40,5 @@ class InternalUnitOfWork(UnitOfWork):
 
 
 __all__ = [
-    'InternalUnitOfWork',
+    "InternalUnitOfWork",
 ]

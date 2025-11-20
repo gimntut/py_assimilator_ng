@@ -2,7 +2,16 @@ from typing import Any, Callable
 
 from assimilator.core.database import BaseModel, FilteringOptions
 from assimilator.internal.database.specifications.internal_operator import (
-    find_attribute, eq, gte, gt, lte, lt, is_, not_, like, regex,
+    find_attribute,
+    eq,
+    gte,
+    gt,
+    lte,
+    lt,
+    is_,
+    not_,
+    like,
+    regex,
 )
 
 
@@ -26,8 +35,8 @@ class InternalFilteringOptions(FilteringOptions):
 
 
 __all__ = [
-    'InternalFilteringOptions',
-    'find_attribute',
+    "InternalFilteringOptions",
+    "find_attribute",
     "eq",
     "gte",
     "gt",

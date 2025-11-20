@@ -1,26 +1,32 @@
 import operator
-
 import os
-os.environ['PY_ASSIMILATOR_MESSAGE'] = 'False'
+from typing import Protocol
 
-from assimilator.core.database import filter_
-from assimilator.core.patterns import LazyCommand
-from assimilator.redis_.database import RedisRepository
-from assimilator.core.database import UnitOfWork, Repository
-from assimilator.mongo.database import MongoRepository
-from assimilator.core.database import NotFoundError
-from assimilator.internal.database import InternalRepository
+os.environ["PY_ASSIMILATOR_MESSAGE"] = "False"
+
 from assimilator.alchemy.database import AlchemyRepository
+from assimilator.core.database import NotFoundError, Repository, UnitOfWork, filter_
+from assimilator.core.patterns import LazyCommand
+from assimilator.internal.database import InternalRepository
 from assimilator.internal.database.specifications.filtering_options import find_attribute
+from assimilator.mongo.database import MongoRepository
+from assimilator.redis_.database import RedisRepository
+from examples.simple_database.dependencies import User, get_uow
 
-from dependencies import get_uow, User
+
+class BaseUser(Protocol):
+    username: str
+    email: str
+    balance: float
+
+    def __init__(self, *, username: str, email: str, balance: float = 0, upsert: bool = False): ...
 
 
 def create_user__kwargs(uow: UnitOfWork):
     with uow:
         uow.repository.save(
-            username='Andrey',
-            email='python.on.papyrus@gmail.com',
+            username="Andrey",
+            email="python.on.papyrus@gmail.com",
             balance=1000,
         )
         uow.commit()
@@ -28,9 +34,9 @@ def create_user__kwargs(uow: UnitOfWork):
 
 def create_user_model(uow: UnitOfWork):
     with uow:
-        user = User(
-            username='Andrey-2',
-            email='python.on.papyrus@gmail.com',
+        user = User(  # type: ignore
+            username="Andrey-2",
+            email="python.on.papyrus@gmail.com",
             balance=2000,
         )
         uow.repository.save(user)
@@ -44,22 +50,26 @@ def read_user(username: str, repository: Repository):
 
 
 def read_user_direct(username: str, repository: Repository):
-    if isinstance(repository, AlchemyRepository):       # Awful! Try to use filtering options
+    if isinstance(repository, AlchemyRepository):  # Awful! Try to use filtering options
         user = repository.get(filter_(User.username == username))
     elif isinstance(repository, (InternalRepository, RedisRepository)):
-        user = repository.get(filter_(
-            find_attribute(operator.eq, 'username', username),
-            # will call eq(model.username, username) for every user
-        ))
+        user = repository.get(
+            filter_(
+                find_attribute(operator.eq, "username", username),
+                # will call eq(model.username, username) for every user
+            )
+        )
     elif isinstance(repository, MongoRepository):
-        user = repository.get(filter_(
-            {'username': username},
-            # will call eq(model.username, username) for every user
-        ))
+        user = repository.get(
+            filter_(
+                {"username": username},
+                # will call eq(model.username, username) for every user
+            )
+        )
     else:
         raise ValueError("Direct repository filter not found")
 
-    print("User direct:", user.id, user.username, user.email, user.balance)
+    print("User direct:", user.id, user.username, user.email, user.balance)  # type: ignore
     return user
 
 
@@ -67,7 +77,7 @@ def update_user(uow: UnitOfWork):
     with uow:
         user = uow.repository.get(filter_(username="Andrey"))
 
-        user.balance += 1000
+        user.balance += 1000  # type: ignore
         uow.repository.update(user)
         uow.commit()
 
@@ -95,7 +105,7 @@ def create_many_users_direct(uow: UnitOfWork):
     with uow:
         for i in range(100):
             uow.repository.save(
-                User(
+                User(  # type: ignore
                     username=f"User-{i}",
                     email=f"user-{i}@py_assimilator.com",
                     balance=i * 100,
@@ -116,14 +126,11 @@ def filter_users(repository: Repository):
 
 def count_users(repository: Repository):
     print("Total users:", repository.count())
-    print(
-        "Users with balance greater than 5000:",
-        repository.count(filter_(balance__gt=5000))
-    )
+    print("Users with balance greater than 5000:", repository.count(filter_(balance__gt=5000)))
 
 
 def filter_users_lazy(repository: Repository):
-    users: LazyCommand[User] = repository.filter(filter_(balance__eq=0), lazy=True)
+    users: LazyCommand[BaseUser] = repository.filter(filter_(balance__eq=0), lazy=True)
 
     for user in users:  # Queries the database here
         print("User without any money:", user.username, user.balance)
@@ -141,7 +148,7 @@ def update_many_users(uow: UnitOfWork):
 
 def delete_many_users(uow: UnitOfWork):
     with uow:
-        uow.repository.delete(filter_(username__regex=r'User-\w*'))
+        uow.repository.delete(filter_(username__regex=r"User-\w*"))
         uow.commit()
 
     assert uow.repository.count(filter_(balance=10)) == 0
@@ -151,17 +158,17 @@ def delete_many_users(uow: UnitOfWork):
 def create_users_error(uow: UnitOfWork):
     with uow:
         uow.repository.save(
-            username='Not saved',
-            email='not-saved@user.com',
+            username="Not saved",
+            email="not-saved@user.com",
             balance=0,
         )
         uow.repository.save(
-            username='Not saved 2',
-            email='not-saved-2@user.com',
+            username="Not saved 2",
+            email="not-saved-2@user.com",
             balance=0,
         )
 
-        1 / 0   # Error. Changes are discarded
+        1 / 0  # Error. Changes are discarded  # pyright: ignore[reportUnusedExpression]
         uow.commit()
 
 
@@ -179,7 +186,7 @@ def check_users_not_saved(uow: UnitOfWork):
         print("User 2 changes were discarded!")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     create_user__kwargs(get_uow())
     create_user_model(get_uow())
 

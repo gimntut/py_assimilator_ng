@@ -39,5 +39,5 @@ class MongoUnitOfWork(UnitOfWork):
 
 
 __all__ = [
-    'MongoUnitOfWork',
+    "MongoUnitOfWork",
 ]

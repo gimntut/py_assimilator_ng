@@ -1,8 +1,9 @@
 import os
 
 
-if os.environ.get('PY_ASSIMILATOR_MESSAGE', None) is None:
-    print(f"""
+if os.environ.get("PY_ASSIMILATOR_MESSAGE", None) is None:
+    print(
+        r"""
                  ___              _           _ __      __            
     ____  __  __/   |  __________(_)___ ___  (_) /___ _/ /_____  _____
    / __ \/ / / / /| | / ___/ ___/ / __ `__ \/ / / __ `/ __/ __ \/ ___/
@@ -22,4 +23,5 @@ if os.environ.get('PY_ASSIMILATOR_MESSAGE', None) is None:
 
     2) You can add it within your system or in your .env file: PY_ASSIMILATOR_MESSAGE=False
     
-    """)
+    """
+    )

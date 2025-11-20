@@ -1,15 +1,17 @@
 from typing import List, Optional
-from uuid import uuid4, UUID
 
 from sqlalchemy import create_engine, Column, String, Float, Integer, ForeignKey, UniqueConstraint
-from sqlalchemy.orm import declarative_base, relationship
+from sqlalchemy.orm import DeclarativeBase, relationship
 
 from assimilator.core.database import BaseModel
 from assimilator.mongo.database import MongoModel
 from assimilator.redis_.database import RedisModel
 
 engine = create_engine(url="sqlite:///:memory:")
-Base = declarative_base()
+
+
+class Base(DeclarativeBase):
+    pass
 
 
 class AlchemyUser(Base):
@@ -27,16 +29,14 @@ class AlchemyUser(Base):
 
 class AlchemyUserBalance(Base):
     __tablename__ = "balances"
-    __table_args__ = (
-        UniqueConstraint("balance", "user_id"),
-    )
+    __table_args__ = (UniqueConstraint("balance", "user_id"),)
 
     id = Column(Integer(), primary_key=True)
 
     user_id = Column(ForeignKey("users.id", ondelete="CASCADE"))
     user = relationship("AlchemyUser", back_populates="balances")
 
-    balance = Column(Float(), server_default='0')
+    balance = Column(Float(), server_default="0")
 
     currency_id = Column(ForeignKey("currency.id"))
     currency = relationship("AlchemyBalanceCurrency", uselist=False)
@@ -155,7 +155,7 @@ class MongoUser(MongoModel):
         collection: str = "users"
 
     balances: List[MongoBalance] = []
-    username: Optional[str]     # For only specification
+    username: Optional[str]  # For only specification
     email: Optional[str]
 
     def __str__(self):

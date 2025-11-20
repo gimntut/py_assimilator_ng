@@ -1,12 +1,12 @@
-from typing import ClassVar, Any, Union, AbstractSet, Mapping, Dict
+from typing import ClassVar, Any, AbstractSet, Mapping
 
 from bson import ObjectId
 from pydantic import Field
 
 from assimilator.core.database.models import BaseModel
 
-AbstractSetIntStr = AbstractSet[Union[int, str]]
-MappingIntStrAny = Mapping[Union[int, str], Any]
+AbstractSetIntStr = AbstractSet[int | str]
+MappingIntStrAny = Mapping[int | str, Any]
 
 
 class MongoModel(BaseModel):
@@ -20,7 +20,7 @@ class MongoModel(BaseModel):
     class AssimilatorConfig:
         collection: ClassVar[str]
         autogenerate_id: ClassVar[bool] = True
-        exclude = {'collection': True, 'upsert': True}
+        exclude = {"collection": True, "upsert": True}
         id_name: ClassVar[str] = "_id"
 
     upsert: bool = False
@@ -28,7 +28,7 @@ class MongoModel(BaseModel):
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
-        cls.__fields__['id'].alias = cls.AssimilatorConfig.id_name
+        cls.__fields__["id"].alias = cls.AssimilatorConfig.id_name
         return cls
 
     def __hash__(self):
@@ -40,8 +40,8 @@ class MongoModel(BaseModel):
     def json(self, *args, by_alias: bool = True, **kwargs) -> str:
         return super(BaseModel, self).json(*args, by_alias=by_alias, **kwargs)
 
-    def dict(self, *args, by_alias: bool = True, **kwargs) -> Dict[str, Any]:
+    def dict(self, *args, by_alias: bool = True, **kwargs) -> dict[str, Any]:
         return super(BaseModel, self).dict(*args, by_alias=by_alias, **kwargs)
 
 
-__all__ = ['MongoModel']
+__all__ = ["MongoModel"]

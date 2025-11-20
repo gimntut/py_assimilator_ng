@@ -1,5 +1,4 @@
 import importlib
-from typing import Dict, Type, Union
 
 from pydantic import BaseModel
 
@@ -12,12 +11,12 @@ class PatternList(BaseModel):
     class Config:
         frozen = True
 
-    repository: Type[Repository]
-    uow: Type[UnitOfWork]
-    crud: Type[CRUDService]
+    repository: type[Repository]
+    uow: type[UnitOfWork]
+    crud: type[CRUDService]
 
 
-registry: Dict[str, PatternList] = {}
+registry: dict[str, PatternList] = {}
 
 
 def register_provider(provider: str, pattern_list: PatternList):
@@ -25,7 +24,7 @@ def register_provider(provider: str, pattern_list: PatternList):
 
 
 def find_provider(provider_path: str):
-    """ Imports a module that has automatic pattern registration """
+    """Imports a module that has automatic pattern registration"""
     importlib.import_module(provider_path)
 
 
@@ -40,7 +39,7 @@ def unregister_provider(provider: str):
         raise ProviderNotFoundError(f"Provider {provider} was not found")
 
 
-def get_pattern(provider: str, pattern_name: str) -> Type[Union[Repository, UnitOfWork, CRUDService]]:
+def get_pattern(provider: str, pattern_name: str) -> type[Repository | UnitOfWork | CRUDService]:
     try:
         pattern_cls = getattr(registry[provider], pattern_name, None)
     except KeyError:
@@ -53,10 +52,10 @@ def get_pattern(provider: str, pattern_name: str) -> Type[Union[Repository, Unit
 
 
 __all__ = [
-    'register_provider',
-    'unregister_provider',
-    'PatternList',
-    'get_pattern_list',
-    'get_pattern',
-    'find_provider',
+    "register_provider",
+    "unregister_provider",
+    "PatternList",
+    "get_pattern_list",
+    "get_pattern",
+    "find_provider",
 ]

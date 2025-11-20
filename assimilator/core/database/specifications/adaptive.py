@@ -9,10 +9,10 @@ class AdaptiveFilter:
         self.fields = fields
         self.kwargs_fields = kwargs_fields
 
-    def __or__(self, other: Union['AdaptiveFilter', 'FilterSpecification']) -> 'CompositeAdaptiveFilter':
+    def __or__(self, other: Union["AdaptiveFilter", "FilterSpecification"]) -> "CompositeAdaptiveFilter":
         return CompositeAdaptiveFilter(first=self, second=other, func=operator.or_)
 
-    def __and__(self, other: Union['AdaptiveFilter', 'FilterSpecification']) -> 'CompositeAdaptiveFilter':
+    def __and__(self, other: Union["AdaptiveFilter", "FilterSpecification"]) -> "CompositeAdaptiveFilter":
         return CompositeAdaptiveFilter(first=self, second=other, func=operator.and_)
 
     def __invert__(self):
@@ -20,16 +20,17 @@ class AdaptiveFilter:
 
     def __call__(self, query, repository, **context):
         return repository.specs.filter(
-            *self.fields, **self.kwargs_fields,
+            *self.fields,
+            **self.kwargs_fields,
         )(query=query, repository=repository)
 
 
 class CompositeAdaptiveFilter(AdaptiveFilter):
     def __init__(
         self,
-        first: Union['AdaptiveFilter', 'FilterSpecification'],
-        second: Union['AdaptiveFilter', 'FilterSpecification'],
-        func: Callable[['AdaptiveFilter', 'AdaptiveFilter'], Any],
+        first: Union["AdaptiveFilter", "FilterSpecification"],
+        second: Union["AdaptiveFilter", "FilterSpecification"],
+        func: Callable[["AdaptiveFilter", "AdaptiveFilter"], Any],
     ):
         super(CompositeAdaptiveFilter, self).__init__()
         self.first = first
@@ -85,10 +86,10 @@ def only(*only_fields: str, query, repository, **context):
 
 
 __all__ = [
-    'AdaptiveFilter',
-    'filter_',
-    'only',
-    'order',
-    'join',
-    'paginate',
+    "AdaptiveFilter",
+    "filter_",
+    "only",
+    "order",
+    "join",
+    "paginate",
 ]

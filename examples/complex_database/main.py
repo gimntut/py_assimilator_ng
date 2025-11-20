@@ -1,20 +1,21 @@
-from assimilator.mongo.database.repository import MongoRepository
+from examples.complex_database.dependencies import Balance, Currency, User, get_uow
+from pymongo.cursor import Sequence
 
-from assimilator.core.patterns import LazyCommand
 from assimilator.alchemy.database import AlchemyRepository
-from assimilator.core.database import UnitOfWork, Repository
+from assimilator.core.database import Repository
+from assimilator.core.database.specifications.adaptive import filter_, join, only, order
+from assimilator.core.patterns import LazyCommand
 from assimilator.internal.database import InternalRepository, eq
+from assimilator.mongo.database.repository import MongoRepository
 from assimilator.redis_.database import RedisRepository
-from assimilator.core.database.specifications.adaptive import join, only, filter_, order
-
-from dependencies import get_uow, User, Balance, Currency
+from examples.complex_database.interfaces import IUnitOfWork, IUser
 
 
-def create_user__kwargs(uow: UnitOfWork):
+def create_user__kwargs(uow: IUnitOfWork):
     with uow:
         uow.repository.save(
-            username='Andrey',
-            email='python.on.papyrus@gmail.com',
+            username="Andrey",
+            email="python.on.papyrus@gmail.com",
             balances=[
                 {
                     "currency": {
@@ -37,21 +38,21 @@ def create_user__kwargs(uow: UnitOfWork):
                     },
                     "balance": 50001,
                 },
-            ]
+            ],
         )
         uow.commit()
 
 
-def create_user_model(uow: UnitOfWork):
+def create_user_model(uow: IUnitOfWork):
     with uow:
-        user = User(
-            username='Andrey-2',
-            email='python.on.papyrus@gmail.com',
+        user = User(  # type: ignore
+            username="Andrey-2",
+            email="python.on.papyrus@gmail.com",
         )
 
         user.balances.append(
-            Balance(
-                currency=Currency(currency="USD", country="USA"),
+            Balance(  # type: ignore
+                currency=Currency(currency="USD", country="USA"),  # type: ignore
                 balance=0,
             )
         )
@@ -60,38 +61,43 @@ def create_user_model(uow: UnitOfWork):
 
 
 def read_user(username: str, balance: int, repository: Repository):
-    user = repository.get(
-        join('balances', 'balances.currency'),
+    if repository.specs is None:
+        return None
+    user: IUser = repository.get(  # type: ignore
+        join("balances", "balances.currency"),
         filter_(
             username__eq=username,
             balances__balance=balance,
-        ) | repository.specs.filter(balances__currency__country="USA")
+        )
+        | repository.specs.filter(balances__currency__country="USA")
         & ~repository.specs.filter(balances__currency__currency="USD"),
-        only('username', 'balances.currency', 'balances.balance'),
+        only("username", "balances.currency", "balances.balance"),
     )
     print("User:", user.id, user.username, user.email)
 
-    for balance in user.balances:
-        print(f"User {user.username} balance: ", balance.currency, balance.balance)
+    for blnc in user.balances:
+        print(f"User {user.username} balance: ", blnc.currency, blnc.balance)
 
     return user
 
 
 def read_user_direct(username: str, repository: Repository):
-    if isinstance(repository, AlchemyRepository):       # Awful! Try to use filtering options
+    if repository.specs is None:
+        return None
+    if isinstance(repository, AlchemyRepository):  # Awful! Try to use filtering options
         user = repository.get(
-            repository.specs.join('balances'),
+            repository.specs.join("balances"),
             repository.specs.filter(User.username == username),
         )
     elif isinstance(repository, (InternalRepository, RedisRepository)):
         user = repository.get(
             repository.specs.filter(
-                eq('username', username),
+                eq("username", username),
                 # will call model.username == username for every model
             )
         )
     elif isinstance(repository, MongoRepository):
-        user = repository.get(repository.specs.filter({ "username": username }))
+        user = repository.get(repository.specs.filter({"username": username}))  # type: ignore
     else:
         raise ValueError("Direct repository filter not found")
 
@@ -103,7 +109,7 @@ def read_user_direct(username: str, repository: Repository):
     return user
 
 
-def update_user(uow: UnitOfWork):
+def update_user(uow: IUnitOfWork):
     with uow:
         user = uow.repository.get(
             uow.repository.specs.filter(
@@ -117,14 +123,14 @@ def update_user(uow: UnitOfWork):
         uow.commit()
 
 
-def update_user_direct(user, uow: UnitOfWork):
+def update_user_direct(user, uow: IUnitOfWork):
     with uow:
         user.balances[0].balance /= 2
         uow.repository.update(user)
         uow.commit()
 
 
-def create_many_users(uow: UnitOfWork):
+def create_many_users(uow: IUnitOfWork):
     with uow:
         for i in range(100):
             uow.repository.save(
@@ -136,7 +142,7 @@ def create_many_users(uow: UnitOfWork):
                             "currency": "USD",
                             "country": "USA",
                         },
-                        "balance": 1000
+                        "balance": 1000,
                     },
                 ],
             )
@@ -144,19 +150,19 @@ def create_many_users(uow: UnitOfWork):
         uow.commit()
 
 
-def create_many_users_direct(uow: UnitOfWork):
+def create_many_users_direct(uow: IUnitOfWork):
     with uow:
         for i in range(100):
             uow.repository.save(
-                User(
+                User(  # type: ignore
                     username=f"User-{i}",
                     email=f"user-{i}@py_assimilator.com",
                     balances=[
-                        Balance(
-                            currency=Currency(currency="EUR", country="EU"),
+                        Balance(  # type: ignore
+                            currency=Currency(currency="EUR", country="EU"),  # type: ignore
                             balance=i * 10,
                         ),
-                    ]
+                    ],
                 )
             )
 
@@ -164,8 +170,8 @@ def create_many_users_direct(uow: UnitOfWork):
 
 
 def filter_users(repository: Repository):
-    users = repository.filter(
-        join('balances'),
+    users: Sequence[IUser] = repository.filter(  # type: ignore
+        join("balances"),
         order("balances.balance"),
         filter_(balances__balance__gt=50),
     )
@@ -176,21 +182,25 @@ def filter_users(repository: Repository):
 
 def count_users(repository: Repository):
     print("Total users:", repository.count())
+    if repository.specs is None:
+        return
     print(
         "Users with balances greater than 5000:",
         repository.count(
-            repository.specs.join('balances', 'balances.currency'),
+            repository.specs.join("balances", "balances.currency"),
             repository.specs.filter(
                 balances__balance__gt=5000,
                 balances__currency__currency="EUR",
             ),
-        )
+        ),
     )
 
 
 def filter_users_lazy(repository: Repository):
-    users: LazyCommand[User] = repository.filter(
-        repository.specs.join('balances'),
+    if repository.specs is None:
+        return
+    users: LazyCommand[IUser] = repository.filter(  # type: ignore
+        repository.specs.join("balances"),
         repository.specs.filter(balances__balance__eq=0),
         lazy=True,
     )
@@ -199,7 +209,9 @@ def filter_users_lazy(repository: Repository):
         print("User without any money:", user.username, user.balances)
 
 
-def update_many_users(uow: UnitOfWork):
+def update_many_users(uow: IUnitOfWork):
+    if uow.repository.specs is None:
+        return
     username_filter = uow.repository.specs.filter(username__like="User-%")
 
     with uow:
@@ -215,18 +227,20 @@ def update_many_users(uow: UnitOfWork):
         assert all(balance.balance == 10 for balance in user.balances)
 
 
-def delete_many_users(uow: UnitOfWork):
+def delete_many_users(uow: IUnitOfWork):
     with uow:
-        uow.repository.delete(uow.repository.specs.filter(
-            username__regex=r'User-\w*',
-        ))
+        uow.repository.delete(
+            uow.repository.specs.filter(
+                username__regex=r"User-\w*",
+            )
+        )
         uow.commit()
 
     specs = uow.repository.specs
-    assert uow.repository.count(specs.join('balances'), specs.filter(balances__balance=10)) == 0
+    assert uow.repository.count(specs.join("balances"), specs.filter(balances__balance=10)) == 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     create_user__kwargs(get_uow())
     create_user_model(get_uow())
 

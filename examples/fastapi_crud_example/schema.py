@@ -1,7 +1,5 @@
-from typing import List, Union
-from uuid import UUID
+from typing import List
 
-from bson import ObjectId
 from pydantic import BaseModel
 
 

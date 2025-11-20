@@ -20,7 +20,7 @@ maintainers = [
 keywords = ["DDD", "Domain-driven design", "Database", "Events", "Architecture", "Patterns", "Backend"]
 description = "The best Domain-driven design patterns for your projects"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 license = "MIT"
 
 classifiers = [
@@ -74,3 +74,32 @@ mongo = [
 'Github' = 'https://github.com/knucklesuganda/py_assimilator/'
 'Youtube RU' = 'https://www.youtube.com/channel/UCSNpJHMOU7FqjD4Ttux0uuw'
 'Youtube ENG' = 'https://www.youtube.com/channel/UCeC9LNDwRP9OfjyOFHaSikA'
+
+[dependency-groups]
+dev = [
+    "black>=24.8.0",
+    "fastapi>=0.121.2",
+    "pre-commit>=4.4.0",
+]
+
+[tool.black]
+target-version = ['py310','py311','py312','py313']
+line-length = 120
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+include = ["pyproject.toml", "assimilator/**/*.py", "examples/**/*.py", "tests/**/*.py"]
+
+[tool.pyright]
+include = ["assimilator"]
+defineConstant = { DEBUG = true }
+pythonVersion = "3.10"
+pythonPlatform = "Linux"
+venvPath = ".venv"
+executionEnvironments = [
+  { root = "assimilator" },
+  { root = "examples" }
+]
+### report settings ###
+typeCheckingMode="basic"

@@ -1,24 +1,19 @@
-from functools import wraps
 from abc import ABC, abstractmethod
-from typing import (
-    TypeVar, Callable, Generic, final,
-    Union, Optional, Iterable, Type,
-    Collection, Tuple, Any, Dict,
-)
+from functools import wraps
+from typing import Any, Callable, Collection, Generic, Iterable, Optional, Tuple, TypeVar, cast, final
 
+from assimilator.core.database.specifications.specifications import SpecificationList, SpecificationType
 from assimilator.core.patterns.error_wrapper import ErrorWrapper
 from assimilator.core.patterns.lazy_command import LazyCommand
-from assimilator.core.database.specifications.specifications import SpecificationType, SpecificationList
 
 
 def make_lazy(func: Callable):
-
     @wraps(func)
     def make_lazy_wrapper(
         self,
         *specifications: SpecificationType,
         lazy: bool = False,
-        initial_query: QueryT = None,
+        initial_query: object = None,
     ):
         if lazy:
             return LazyCommand(func, self, *specifications, lazy=False, initial_query=initial_query)
@@ -30,52 +25,51 @@ def make_lazy(func: Callable):
 QueryT = TypeVar("QueryT")
 ModelT = TypeVar("ModelT")
 SessionT = TypeVar("SessionT")
-SpecsT = TypeVar("SpecsT", bound=Type[SpecificationList])
+SpecsT = TypeVar("SpecsT", bound=SpecificationList)
 
 
-class Repository(Generic[SessionT, ModelT, QueryT], ABC):
+class Repository(Generic[SessionT, ModelT, QueryT, SpecsT], ABC):
     def __init__(
         self,
         session: SessionT,
-        model: Type[ModelT],
-        specifications: SpecsT,
+        model: type[ModelT],
+        specifications: type[SpecsT],
         initial_query: Optional[QueryT] = None,
         error_wrapper: Optional[ErrorWrapper] = None,
     ):
         self.session = session
         self.model = model
-        self.__initial_query: QueryT = initial_query
-        self.specifications: SpecsT = specifications
+        self.__initial_query: QueryT | None = initial_query
+        self.specifications: type[SpecsT] | None = specifications
 
         self.error_wrapper = error_wrapper or ErrorWrapper()
         self.get = LazyCommand.decorate(self.error_wrapper.decorate(self.get))
-        self.filter: Repository.filter = LazyCommand.decorate(self.error_wrapper.decorate(self.filter))
-        self.save: Repository.save = self.error_wrapper.decorate(self.save)
-        self.delete: Repository.delete = self.error_wrapper.decorate(self.delete)
-        self.update: Repository.update = self.error_wrapper.decorate(self.update)
-        self.is_modified: Repository.is_modified = self.error_wrapper.decorate(self.is_modified)
-        self.refresh: Repository.refresh = self.error_wrapper.decorate(self.refresh)
-        self.count: Repository.count = LazyCommand.decorate(self.error_wrapper.decorate(self.count))
+        self.filter = LazyCommand.decorate(self.error_wrapper.decorate(self.filter))
+        self.save = self.error_wrapper.decorate(self.save)
+        self.delete = self.error_wrapper.decorate(self.delete)
+        self.update = self.error_wrapper.decorate(self.update)
+        self.is_modified = self.error_wrapper.decorate(self.is_modified)
+        self.refresh = self.error_wrapper.decorate(self.refresh)
+        self.count = LazyCommand.decorate(self.error_wrapper.decorate(self.count))
 
     @final
     def _check_obj_is_specification(
-        self,
-        obj: ModelT,
-        specifications: Iterable[SpecificationType]
-    ) -> Tuple[Optional[ModelT], Iterable[SpecificationType]]:
+        self, obj: ModelT | None, specifications: Iterable[SpecificationType]
+    ) -> Tuple[ModelT | None, Iterable[SpecificationType]]:
         """
         This function is called for parts of the code that use both obj and *specifications.
         We check that if the obj is a model
         """
 
         if not isinstance(obj, self.model) and (obj is not None):
-            return None, (obj, *specifications)     # obj is specification
+            spec = cast(SpecificationType, obj)
+            return None, (spec, *specifications)  # obj is specification
 
         return obj, specifications
 
     @property
-    def specs(self) -> SpecsT:
-        """ That property is used to shorten the full name of the self.specifications. """
+    def specs(self) -> type[SpecsT] | None:
+        """That property is used to shorten the full name of the self.specifications."""
         return self.specifications
 
     def get_initial_query(self, override_query: Optional[QueryT] = None) -> QueryT:
@@ -86,7 +80,7 @@ class Repository(Generic[SessionT, ModelT, QueryT], ABC):
         else:
             raise NotImplementedError("You must either pass the initial query or define get_initial_query()")
 
-    def _get_specifications_context(self) -> Dict[str, Any]:
+    def _get_specifications_context(self) -> dict[str, Any]:
         return {"model": self.model, "repository": self}
 
     @abstractmethod
@@ -99,7 +93,8 @@ class Repository(Generic[SessionT, ModelT, QueryT], ABC):
 
     @final
     def _apply_specifications(
-        self, query: Union[QueryT, None],
+        self,
+        query: QueryT | None,
         specifications: Iterable[SpecificationType],
     ) -> QueryT:
         query = self.get_initial_query(query)
@@ -115,7 +110,7 @@ class Repository(Generic[SessionT, ModelT, QueryT], ABC):
         *specifications: SpecificationType,
         lazy: bool = False,
         initial_query: QueryT = None,
-    ) -> Union[ModelT, LazyCommand[ModelT]]:
+    ) -> ModelT | LazyCommand[ModelT]:
         raise NotImplementedError("get() is not implemented()")
 
     @abstractmethod
@@ -124,7 +119,7 @@ class Repository(Generic[SessionT, ModelT, QueryT], ABC):
         *specifications: SpecificationType,
         lazy: bool = False,
         initial_query: QueryT = None,
-    ) -> Union[Collection[ModelT], LazyCommand[Collection[ModelT]]]:
+    ) -> Collection[ModelT] | LazyCommand[Collection[ModelT]]:
         raise NotImplementedError("filter() is not implemented()")
 
     @abstractmethod
@@ -153,7 +148,7 @@ class Repository(Generic[SessionT, ModelT, QueryT], ABC):
         *specifications: SpecificationType,
         lazy: bool = False,
         initial_query: QueryT = None,
-    ) -> Union[LazyCommand[int], int]:
+    ) -> LazyCommand[int] | int:
         raise NotImplementedError("count() is not implemented in the repository")
 
     def __str__(self):
@@ -164,7 +159,7 @@ class Repository(Generic[SessionT, ModelT, QueryT], ABC):
 
 
 __all__ = [
-    'LazyCommand',
-    'Repository',
-    'make_lazy',
+    "LazyCommand",
+    "Repository",
+    "make_lazy",
 ]
